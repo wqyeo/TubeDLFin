@@ -7,8 +7,8 @@ using Xunit;
 namespace Jellyfin.Plugin.TubeDLFin.Tests;
 
 /// <summary>
-/// build.yaml (read by JPRM), Directory.Build.props and web/src/plugin.ts duplicate facts from the code;
-/// these tests stop them from drifting apart.
+/// build.yaml (read by JPRM), Directory.Build.props, CHANGELOG.md and web/src/plugin.ts duplicate facts
+/// from the code; these tests stop them from drifting apart.
 /// </summary>
 public class BuildManifestTests
 {
@@ -33,6 +33,16 @@ public class BuildManifestTests
         var propsVersion = props.Root!.Element("PropertyGroup")!.Element("Version")!.Value;
 
         Assert.Equal(propsVersion, YamlValue("version"));
+    }
+
+    [Fact]
+    public void Changelog_HasSectionForVersion()
+    {
+        // The release pipeline publishes this section as the release notes and fails without it.
+        var changelog = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "CHANGELOG.md"));
+        var version = Version.Parse(YamlValue("version"));
+
+        Assert.Contains($"\n## [{version.ToString(3)}] - ", changelog, StringComparison.Ordinal);
     }
 
     [Fact]

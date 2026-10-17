@@ -50,8 +50,8 @@ public static class NamingPresets
         NamingPresetId.Playlist,
         "Playlist / 01 - Title [id]",
         "Blender Conference 2024/01 - Keynote [VZ5022VaMmA].mp4",
-        $"%(playlist_title,uploader|Unknown)s/%(playlist_index&{{:02d}} - |)s{Parts.TitleAndId}.%(ext)s",
-        $"%(playlist_title,uploader|Unknown)s/%(playlist_index&{{:02d}} - |)s{Parts.TitleAndId}-poster.%(ext)s",
+        $"{Parts.PlaylistTitle}/%(playlist_index&{{:02d}} - |)s{Parts.TitleAndId}.%(ext)s",
+        $"{Parts.PlaylistTitle}/%(playlist_index&{{:02d}} - |)s{Parts.TitleAndId}-poster.%(ext)s",
         []);
 
     /// <summary>
@@ -61,8 +61,8 @@ public static class NamingPresets
         NamingPresetId.MusicVideo,
         "Artist / Title [id]",
         "Daft Punk/Da Funk [d7woYjGWs6k].mp4",
-        $"{Parts.Artist}/%(track,title)s [%(id)s].%(ext)s",
-        $"{Parts.Artist}/%(track,title)s [%(id)s]-poster.%(ext)s",
+        $"{Parts.Artist}/{Parts.Track} [%(id)s].%(ext)s",
+        $"{Parts.Artist}/{Parts.Track} [%(id)s]-poster.%(ext)s",
         [LibraryType.MusicVideos]);
 
     /// <summary>
@@ -74,18 +74,24 @@ public static class NamingPresets
         NamingPresetId.Music,
         "Artist / Album / 01 - Title",
         "Daft Punk/Homework/01 - Daftendirekt.m4a",
-        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}%(track,title)s.%(ext)s",
-        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}%(track,title)s-poster.%(ext)s",
+        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}{Parts.Track}.%(ext)s",
+        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}{Parts.Track}-poster.%(ext)s",
         [LibraryType.Music]);
 
-    // Template pieces shared by the presets.
+    // Template pieces shared by the presets. Each name is cut to a number of bytes (".120B"), so
+    // every folder and file name stays under the usual 255-byte limit without losing the "[id]"
+    // or extension after it. yt-dlp's --trim-filenames can't do this: it cuts the whole relative
+    // path, folders included, from the end.
     private static class Parts
     {
-        public const string Channel = "%(uploader,channel,creator|Unknown)s";
-        public const string Artist = "%(artist,creator,uploader|Unknown)s";
-        public const string TitleAndId = "%(title)s [%(id)s]";
-        public const string AlbumArtist = "%(album_artist,artist,creator,uploader|Unknown)s";
-        public const string Album = "%(album|Singles)s";
+        public const string Channel = "%(uploader,channel,creator|Unknown).60B";
+        public const string Artist = "%(artist,creator,uploader|Unknown).60B";
+        public const string Title = "%(title).120B";
+        public const string TitleAndId = Title + " [%(id)s]";
+        public const string Track = "%(track,title).120B";
+        public const string AlbumArtist = "%(album_artist,artist,creator,uploader|Unknown).60B";
+        public const string Album = "%(album|Singles).80B";
+        public const string PlaylistTitle = "%(playlist_title,uploader|Unknown).80B";
 
         // "01 - " when the track has a number (music tagging pads it to two digits).
         public const string TrackPrefix = "%(track_number&{} - |)s";

@@ -18,6 +18,7 @@ public sealed class YtDlpErrorExplainer : IYtDlpErrorExplainer
         ("Sign in to confirm", "YouTube wants this server to sign in (common on VPS and data-centre IP addresses). Set a cookies file under Tools & settings."),
         ("cookies", "Check the cookies file set under Tools & settings."),
         ("HTTP Error 429", "The site is rate-limiting this server. Try again later."),
+        ("HTTP Error 403", "The site refused the download. On YouTube this is often temporary: try again later. If it keeps happening, update yt-dlp or set a cookies file under Tools & settings."),
     ];
 
     /// <inheritdoc />

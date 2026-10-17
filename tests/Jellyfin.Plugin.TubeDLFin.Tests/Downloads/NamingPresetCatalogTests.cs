@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.RegularExpressions;
 using Jellyfin.Plugin.TubeDLFin.Downloads;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
 using Jellyfin.Plugin.TubeDLFin.Libraries;
@@ -29,6 +30,26 @@ public class NamingPresetCatalogTests
         var catalog = new NamingPresetCatalog([NamingPresets.Playlist, NamingPresets.Music]);
 
         Assert.Equal(NamingPresetId.Playlist, catalog.DefaultFor(LibraryType.Movies).Id);
+    }
+
+    [Fact]
+    public void Presets_CapEveryNameFieldInBytes()
+    {
+        // Free-text fields must carry ".NB" so no folder or file name passes 255 bytes.
+        string[] textFields = ["title", "track", "uploader", "channel", "artist", "album", "album_artist", "playlist_title", "creator"];
+        Assert.All(_catalog.Presets, preset =>
+        {
+            foreach (var template in new[] { preset.MediaTemplate, preset.ThumbnailTemplate })
+            {
+                foreach (Match field in Regex.Matches(template, @"%\((?<name>[a-z_]+)[^)]*\)(?<format>[^a-zA-Z]*[a-zA-Z])"))
+                {
+                    if (textFields.Contains(field.Groups["name"].Value))
+                    {
+                        Assert.Matches(@"^\.\d+B$", field.Groups["format"].Value);
+                    }
+                }
+            }
+        });
     }
 
     [Fact]

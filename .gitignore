@@ -19,3 +19,14 @@ web/.test-dist/
 dev/config/
 dev/cache/
 dev/media/
+
+# Media from trying downloads by hand (never commit media files)
+/*.m4a
+/*.mp3
+/*.opus
+/*.flac
+/*.mp4
+/*.mkv
+/*.webm
+/*.part
+/*.ytdl

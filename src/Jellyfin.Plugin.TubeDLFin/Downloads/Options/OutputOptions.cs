@@ -10,9 +10,6 @@ namespace Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 /// </summary>
 public sealed class OutputOptions : IDownloadOptionSet
 {
-    // Long titles in UTF-8 can pass the 255-byte file name limit; keep room for " [id].ext".
-    private const string MaxFileNameLength = "150";
-
     private readonly INamingPresetCatalog _naming;
 
     /// <summary>
@@ -44,9 +41,8 @@ public sealed class OutputOptions : IDownloadOptionSet
         // "Recently added" should sort by download time, not by the upload date.
         arguments.Add("--no-mtime");
 
-        // Libraries often live on SMB/NAS shares: avoid characters Windows can't store.
+        // Libraries often live on SMB/NAS shares: avoid characters Windows can't store. Name
+        // lengths are limited by the templates (see NamingPresets).
         arguments.Add("--windows-filenames");
-        arguments.Add("--trim-filenames");
-        arguments.Add(MaxFileNameLength);
     }
 }

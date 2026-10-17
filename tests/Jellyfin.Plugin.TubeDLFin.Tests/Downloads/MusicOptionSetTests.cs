@@ -104,7 +104,7 @@ public class MusicOptionSetTests
     public void MusicPreset_AlbumArtistAlbumTrackNumber()
     {
         Assert.Equal(
-            "%(album_artist,artist,creator,uploader|Unknown)s/%(album|Singles)s/%(track_number&{} - |)s%(track,title)s.%(ext)s",
+            "%(album_artist,artist,creator,uploader|Unknown).60B/%(album|Singles).80B/%(track_number&{} - |)s%(track,title).120B.%(ext)s",
             NamingPresets.Music.MediaTemplate);
     }
 

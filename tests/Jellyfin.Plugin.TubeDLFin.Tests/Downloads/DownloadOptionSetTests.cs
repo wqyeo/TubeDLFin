@@ -17,9 +17,9 @@ public class DownloadOptionSetTests
         Assert.Equal(
             [
                 "--paths", "/media/movies", "--paths", "temp:/data/tmp/downloads/job1",
-                "--output", "%(uploader,channel,creator|Unknown)s/%(title)s [%(id)s].%(ext)s",
-                "--output", "thumbnail:%(uploader,channel,creator|Unknown)s/%(title)s [%(id)s]-poster.%(ext)s",
-                "--no-mtime", "--windows-filenames", "--trim-filenames", "150",
+                "--output", "%(uploader,channel,creator|Unknown).60B/%(title).120B [%(id)s].%(ext)s",
+                "--output", "thumbnail:%(uploader,channel,creator|Unknown).60B/%(title).120B [%(id)s]-poster.%(ext)s",
+                "--no-mtime", "--windows-filenames",
             ],
             Apply(new OutputOptions(Naming.Catalog()), DownloadPlans.Create()));
     }
@@ -29,8 +29,8 @@ public class DownloadOptionSetTests
     {
         var arguments = Apply(new OutputOptions(Naming.Catalog()), DownloadPlans.Create(new DownloadProfile { Naming = NamingPresetId.MovieFolder }));
 
-        Assert.Contains("%(title)s [%(id)s]/%(title)s [%(id)s].%(ext)s", arguments);
-        Assert.Contains("thumbnail:%(title)s [%(id)s]/poster.%(ext)s", arguments);
+        Assert.Contains("%(title).120B [%(id)s]/%(title).120B [%(id)s].%(ext)s", arguments);
+        Assert.Contains("thumbnail:%(title).120B [%(id)s]/poster.%(ext)s", arguments);
     }
 
     [Fact]
