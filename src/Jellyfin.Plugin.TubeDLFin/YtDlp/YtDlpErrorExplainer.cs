@@ -11,7 +11,7 @@ public sealed class YtDlpErrorExplainer : IYtDlpErrorExplainer
 {
     private static readonly IReadOnlyList<(string Match, string Explanation)> _explanations =
     [
-        ("Read-only file system", "The library folder is read-only. In Docker, mount the media folder without \":ro\"."),
+        ("Read-only file system", "The library folder is read-only for Jellyfin. Check that the Docker volume has no \":ro\", that the jellyfin service allows writing there (ReadWritePaths), and that the drive itself isn't mounted read-only."),
         ("Permission denied", "Jellyfin may not write to the library folder. Check the folder's owner and permissions (PUID/PGID in Docker)."),
         ("Access to the path", "Jellyfin may not write to the library folder. Check the folder's owner and permissions (PUID/PGID in Docker)."),
         ("No space left on device", "The disk is full."),

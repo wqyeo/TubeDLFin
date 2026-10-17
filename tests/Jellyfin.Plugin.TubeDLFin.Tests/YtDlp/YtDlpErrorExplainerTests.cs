@@ -8,7 +8,7 @@ public class YtDlpErrorExplainerTests
     private readonly YtDlpErrorExplainer _explainer = new();
 
     [Theory]
-    [InlineData("[Errno 30] Read-only file system: '/media/movies/x'", "The library folder is read-only.")]
+    [InlineData("[Errno 30] Read-only file system: '/media/movies/x'", "read-only for Jellyfin. Check that the Docker volume has no \":ro\"")]
     [InlineData("[youtube] abc: Sign in to confirm you're not a bot.", "Set a cookies file")]
     [InlineData("unable to download video data: HTTP Error 403: Forbidden", "often temporary")]
     [InlineData("Unable to download webpage: HTTP Error 429: Too Many Requests", "rate-limiting")]

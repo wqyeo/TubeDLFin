@@ -95,7 +95,7 @@ public sealed class DownloadJobTests : IDisposable
 
         var info = _job.Snapshot();
         Assert.Equal(DownloadState.Failed, info.State);
-        Assert.StartsWith("The library folder is read-only.", info.Error, StringComparison.Ordinal);
+        Assert.StartsWith("The library folder is read-only for Jellyfin.", info.Error, StringComparison.Ordinal);
     }
 
     [Fact]

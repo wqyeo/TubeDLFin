@@ -5,6 +5,10 @@ download workflow into the Jellyfin dashboard. Paste a video, playlist or channe
 what is available, pick the options, and TubeDLFin downloads it straight into one of your
 libraries, named and tagged so Jellyfin shows it properly.
 
+> Development happens on GitLab: [gitlab.com/wqyeo/jellyfin-plugin-tubedlfin](https://gitlab.com/wqyeo/jellyfin-plugin-tubedlfin).
+> [github.com/wqyeo/TubeDLFin](https://github.com/wqyeo/TubeDLFin) is a read-only mirror:
+> please open issues and merge requests on GitLab.
+
 ![The download page after detecting a video](docs/images/download.png)
 
 - Jellyfin **12.2** (`targetAbi 12.2.0.0`) on Linux (x64, arm64 such as a Raspberry Pi), Windows or macOS
@@ -127,7 +131,8 @@ so keep the file private.
 | Problem | What to do |
 |---|---|
 | "Sign in to confirm you're not a bot" | Set a [cookies file](#cookies-youtube-sign-in-to-confirm-youre-not-a-bot) |
-| "Read-only file system" / "Permission denied" | The library folder isn't writable by Jellyfin: see [Docker](#docker) |
+| "Read-only file system" | The folder is mounted read-only for Jellyfin. Docker: remove `:ro` from the volume ([Docker](#docker)). Linux packages: if the `jellyfin` service is sandboxed (`systemctl cat jellyfin` shows `ProtectSystem=`), add `ReadWritePaths=/your/media` with `systemctl edit jellyfin`. Otherwise the drive itself is read-only: check `findmnt -T /your/media` and `dmesg` (external NTFS/exFAT drives often mount read-only after being unplugged without ejecting) |
+| "Permission denied" | The user Jellyfin runs as can't write to the folder: check its owner (`ls -ld`), and `user:` / `PUID`/`PGID` in Docker |
 | HTTP 403 or 429 | The site is limiting this server. Wait a while; cookies help with YouTube |
 | yt-dlp or Deno "not ready" | **Tools & settings → Update now**, and check Jellyfin's log. The server needs access to `github.com` |
 | Formats missing or "Requested format is not available" | Update yt-dlp (it is updated daily; sites change often). Check that Deno shows as ready |

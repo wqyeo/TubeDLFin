@@ -5,6 +5,15 @@ All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.P
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-18
+
+First stable release, with the features of 0.9.0. Tested on Linux x64 and on a Raspberry Pi (arm64).
+
+### Changed
+- The "Read-only file system" error now also points to the Linux package's service sandbox and to
+  drives mounted read-only, not only to Docker's `:ro`. The README's troubleshooting table
+  explains each case.
+
 ## [0.9.0] - 2026-10-17
 
 First public build, a release candidate for 1.0.
