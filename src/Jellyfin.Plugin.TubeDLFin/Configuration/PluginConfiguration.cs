@@ -19,4 +19,10 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Blank means TubeDLFin downloads and updates Deno itself.
     /// </summary>
     public string DenoPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets how many downloads run at the same time. Keep it at 1 on a Raspberry Pi:
+    /// merging and converting use the CPU.
+    /// </summary>
+    public int MaxConcurrentDownloads { get; set; } = 1;
 }

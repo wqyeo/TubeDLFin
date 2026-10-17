@@ -24,6 +24,13 @@ public static class YtDlpMessages
         Lines(standardError, ErrorPrefix).LastOrDefault();
 
     /// <summary>
+    /// Reads one line as an error.
+    /// </summary>
+    /// <param name="line">A line yt-dlp printed.</param>
+    /// <returns>The error without its prefix, or <c>null</c> if the line isn't an error.</returns>
+    public static string? Error(string line) => Message(line, ErrorPrefix);
+
+    /// <summary>
     /// Finds every warning yt-dlp reported, without duplicates.
     /// </summary>
     /// <param name="standardError">yt-dlp's standard error.</param>
@@ -35,17 +42,27 @@ public static class YtDlpMessages
     {
         ArgumentNullException.ThrowIfNull(text);
 
-        foreach (var rawLine in text.Split('\n'))
+        foreach (var line in text.Split('\n'))
         {
-            var line = rawLine.TrimEnd('\r');
-            if (!line.StartsWith(prefix, StringComparison.Ordinal))
+            if (Message(line, prefix) is { } message)
             {
-                continue;
+                yield return message;
             }
-
-            var message = line[prefix.Length..];
-            var suffix = message.IndexOf(ReportSuffix, StringComparison.Ordinal);
-            yield return (suffix < 0 ? message : message[..suffix]).Trim();
         }
+    }
+
+    private static string? Message(string line, string prefix)
+    {
+        ArgumentNullException.ThrowIfNull(line);
+
+        line = line.TrimEnd('\r');
+        if (!line.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var message = line[prefix.Length..];
+        var suffix = message.IndexOf(ReportSuffix, StringComparison.Ordinal);
+        return (suffix < 0 ? message : message[..suffix]).Trim();
     }
 }

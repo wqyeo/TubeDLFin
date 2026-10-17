@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using Jellyfin.Plugin.TubeDLFin.YtDlp;
 
 namespace Jellyfin.Plugin.TubeDLFin.Detection;
 

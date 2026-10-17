@@ -36,4 +36,10 @@ public sealed class PluginPaths : IPluginPaths
 
     /// <inheritdoc />
     public string TempDirectory => Path.Combine(DataRoot, "tmp");
+
+    /// <inheritdoc />
+    public string DownloadsTempDirectory => Path.Combine(TempDirectory, "downloads");
+
+    /// <inheritdoc />
+    public string ArchiveDirectory => Path.Combine(DataRoot, "archive");
 }

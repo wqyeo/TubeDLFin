@@ -2,14 +2,18 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using Jellyfin.Plugin.TubeDLFin.Detection;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
 using Jellyfin.Plugin.TubeDLFin.Tools.Status;
 using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller;
+using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.MediaEncoding;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -31,6 +35,8 @@ public class PluginServiceRegistratorTests
         services.AddSingleton(Substitute.For<IPluginManager>());
         services.AddSingleton(Substitute.For<IMediaEncoder>());
         services.AddSingleton(Substitute.For<IHttpClientFactory>());
+        services.AddSingleton(Substitute.For<ILibraryManager>());
+        services.AddSingleton(Substitute.For<ILibraryMonitor>());
         services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
 
         new PluginServiceRegistrator().RegisterServices(services, serverHost);
@@ -41,6 +47,9 @@ public class PluginServiceRegistratorTests
         Assert.Equal(2, provider.GetRequiredService<IToolDefinitionRegistry>().All.Count);
         Assert.IsType<CachingToolVersionProbe>(provider.GetRequiredService<IToolVersionProbe>());
         Assert.IsType<ThrottledMediaProber>(provider.GetRequiredService<IMediaProber>());
+        Assert.Same(provider.GetRequiredService<IDownloadManager>(), provider.GetRequiredService<IDownloadJobSource>());
+        Assert.Contains(provider.GetServices<IHostedService>(), s => s is DownloadDispatcher);
+        Assert.Equal(6, provider.GetServices<IDownloadOptionSet>().Count());
         Assert.NotNull(new UpdateToolsTask(provider.GetRequiredService<IToolUpdateService>()));
     }
 }

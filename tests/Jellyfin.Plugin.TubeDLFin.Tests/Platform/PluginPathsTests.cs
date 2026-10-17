@@ -18,6 +18,8 @@ public class PluginPathsTests
         var paths = new PluginPaths(applicationPaths);
 
         Assert.Equal(Path.Combine("config", "data", "tubedlfin"), paths.DataRoot);
+        Assert.Equal(Path.Combine("config", "data", "tubedlfin", "tmp", "downloads"), paths.DownloadsTempDirectory);
+        Assert.Equal(Path.Combine("config", "data", "tubedlfin", "archive"), paths.ArchiveDirectory);
     }
 
     [Fact]

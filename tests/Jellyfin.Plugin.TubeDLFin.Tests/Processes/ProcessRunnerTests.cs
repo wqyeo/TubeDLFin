@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.TubeDLFin.Processes;
@@ -59,6 +60,44 @@ public class ProcessRunnerTests
     {
         await Assert.ThrowsAsync<System.ComponentModel.Win32Exception>(() =>
             _runner.RunAsync(new ProcessRequest("/definitely/not/here", []), TestContext.Current.CancellationToken));
+    }
+
+    [Fact(SkipUnless = nameof(IsUnix), Skip = "Needs /bin/sh")]
+    public async Task StreamAsync_HandsOverLinesFromBothStreams()
+    {
+        var lines = new System.Collections.Concurrent.ConcurrentQueue<ProcessOutputLine>();
+
+        var exit = await _runner.StreamAsync(
+            Shell("echo one; echo two >&2; printf 'three'; exit 2"),
+            lines.Enqueue,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(new ProcessExit(2, TimedOut: false), exit);
+        Assert.Equal(
+            new[] { new ProcessOutputLine("one", false), new ProcessOutputLine("three", false), new ProcessOutputLine("two", true) },
+            lines.OrderBy(l => l.IsError).ThenBy(l => l.Text, StringComparer.Ordinal));
+    }
+
+    [Fact(SkipUnless = nameof(IsUnix), Skip = "Needs /bin/sh")]
+    public async Task StreamAsync_LinesArriveWhileRunning()
+    {
+        var firstLine = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+
+        var run = _runner.StreamAsync(Shell("echo started; sleep 30"), line => firstLine.TrySetResult(line.Text), cts.Token);
+
+        Assert.Equal("started", await firstLine.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken));
+        await cts.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => run);
+    }
+
+    [Fact(SkipUnless = nameof(IsUnix), Skip = "Needs /bin/sh")]
+    public async Task StreamAsync_Timeout_ReportsTimedOut()
+    {
+        var exit = await _runner.StreamAsync(Shell("sleep 30") with { Timeout = TimeSpan.FromMilliseconds(200) }, _ => { }, TestContext.Current.CancellationToken);
+
+        Assert.True(exit.TimedOut);
+        Assert.False(exit.Succeeded);
     }
 
     private static ProcessRequest Shell(string script) => new("/bin/sh", ["-c", script]);

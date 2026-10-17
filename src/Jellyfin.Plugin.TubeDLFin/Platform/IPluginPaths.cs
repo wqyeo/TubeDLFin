@@ -27,4 +27,16 @@ public interface IPluginPaths
     /// Kept outside the libraries so Jellyfin never scans half-written files.
     /// </summary>
     string TempDirectory { get; }
+
+    /// <summary>
+    /// Gets the folder for the temp folders of download jobs, inside <see cref="TempDirectory"/>.
+    /// Emptied at server start, since jobs don't survive a restart.
+    /// </summary>
+    string DownloadsTempDirectory { get; }
+
+    /// <summary>
+    /// Gets the folder holding one download archive per library: the ids of everything downloaded
+    /// into it, so nothing is downloaded twice.
+    /// </summary>
+    string ArchiveDirectory { get; }
 }

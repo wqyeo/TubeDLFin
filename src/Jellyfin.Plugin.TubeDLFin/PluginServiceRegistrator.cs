@@ -1,6 +1,11 @@
 using System;
 using Jellyfin.Plugin.TubeDLFin.Configuration;
 using Jellyfin.Plugin.TubeDLFin.Detection;
+using Jellyfin.Plugin.TubeDLFin.Downloads;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
+using Jellyfin.Plugin.TubeDLFin.Libraries;
 using Jellyfin.Plugin.TubeDLFin.Platform;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Status;
@@ -60,5 +65,27 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IProbeResultParser, ProbeResultParser>();
         serviceCollection.AddSingleton<IMediaProber>(services =>
             new ThrottledMediaProber(ActivatorUtilities.CreateInstance<YtDlpMediaProber>(services), MaxConcurrentProbes));
+
+        // Libraries
+        serviceCollection.AddSingleton<ILibraryCatalog, JellyfinLibraryCatalog>();
+        serviceCollection.AddSingleton<ILibraryNotifier, JellyfinLibraryNotifier>();
+
+        // Downloads: add a group of yt-dlp options (subtitles, SponsorBlock, ...) by registering
+        // another IDownloadOptionSet. They are applied in this order.
+        serviceCollection.AddSingleton<IDownloadRequestValidator, DownloadRequestValidator>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, OutputOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, ProgressOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, ArchiveOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, PlaylistOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, VideoFormatOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, AudioFormatOptions>();
+        serviceCollection.AddSingleton<IDownloadArgumentsBuilder, DownloadArgumentsBuilder>();
+        serviceCollection.AddSingleton<IYtDlpOutputParser, YtDlpOutputParser>();
+        serviceCollection.AddSingleton<IDownloadErrorExplainer, DownloadErrorExplainer>();
+        serviceCollection.AddSingleton<DownloadManager>();
+        serviceCollection.AddSingleton<IDownloadManager>(services => services.GetRequiredService<DownloadManager>());
+        serviceCollection.AddSingleton<IDownloadJobSource>(services => services.GetRequiredService<DownloadManager>());
+        serviceCollection.AddSingleton<IDownloadRunner, DownloadRunner>();
+        serviceCollection.AddHostedService<DownloadDispatcher>();
     }
 }

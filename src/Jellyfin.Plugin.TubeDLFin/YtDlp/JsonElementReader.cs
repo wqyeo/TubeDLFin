@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace Jellyfin.Plugin.TubeDLFin.Detection;
+namespace Jellyfin.Plugin.TubeDLFin.YtDlp;
 
 /// <summary>
 /// Lenient reads of optional properties: yt-dlp leaves out or nulls whatever a site doesn't
