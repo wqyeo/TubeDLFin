@@ -56,3 +56,5 @@ dotnet_diagnostic.CA1054.severity = none
 dotnet_diagnostic.CA1062.severity = none
 # Responses handed to HttpClient are disposed by it
 dotnet_diagnostic.CA2000.severity = none
+# Expected values are written inline as arrays
+dotnet_diagnostic.CA1861.severity = none

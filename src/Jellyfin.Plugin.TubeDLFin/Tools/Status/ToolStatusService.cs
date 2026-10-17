@@ -53,6 +53,10 @@ public sealed class ToolStatusService : IToolStatusService
         return new ToolsOverview(_locator.Platform.Id, tools, _ffmpeg.GetStatus(), _updates.IsRunning, _updates.LastReport);
     }
 
+    /// <inheritdoc />
+    public Task<ToolStatus> GetStatusAsync(ToolKind kind, CancellationToken cancellationToken) =>
+        GetStatusAsync(_definitions.GetDefinition(kind), cancellationToken);
+
     private static ToolStatus Status(IToolDefinition definition, ToolLocation location, ToolState state, string? version, string? message) =>
         new(definition.Kind, definition.DisplayName, state, version, location.ExecutablePath, location.IsCustom, message);
 

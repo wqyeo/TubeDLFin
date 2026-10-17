@@ -94,6 +94,17 @@ public sealed class ToolStatusServiceTests : IDisposable
         Assert.Same(report, overview.LastUpdate);
     }
 
+    [Fact]
+    public async Task GetStatusAsync_ChecksOneTool()
+    {
+        Install(ToolKind.YtDlp, ToolProbeResult.Ok("2026.08.19"));
+
+        var status = await _service.GetStatusAsync(ToolKind.YtDlp, TestContext.Current.CancellationToken);
+
+        Assert.Equal((ToolKind.YtDlp, ToolState.Ready, "2026.08.19"), (status.Kind, status.State, status.Version));
+        Assert.Equal(_temp.Combine("YtDlp"), status.Path);
+    }
+
     private void Install(ToolKind kind, ToolProbeResult result)
     {
         var path = _temp.WriteFile(kind.ToString(), "binary");

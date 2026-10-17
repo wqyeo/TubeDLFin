@@ -1,0 +1,84 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Jellyfin.Plugin.TubeDLFin.Platform;
+using Jellyfin.Plugin.TubeDLFin.Processes;
+using Jellyfin.Plugin.TubeDLFin.Tools;
+using Jellyfin.Plugin.TubeDLFin.Tools.Status;
+
+namespace Jellyfin.Plugin.TubeDLFin.YtDlp;
+
+/// <summary>
+/// <see cref="IYtDlpCommandFactory"/> that checks the tools through <see cref="IToolStatusService"/>.
+/// </summary>
+public sealed class YtDlpCommandFactory : IYtDlpCommandFactory
+{
+    private readonly IToolStatusService _tools;
+    private readonly IFfmpegLocator _ffmpeg;
+    private readonly IPluginPaths _paths;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="YtDlpCommandFactory"/> class.
+    /// </summary>
+    /// <param name="tools">Reports whether yt-dlp and Deno work.</param>
+    /// <param name="ffmpeg">Finds Jellyfin's FFmpeg.</param>
+    /// <param name="paths">The plugin's folders.</param>
+    public YtDlpCommandFactory(IToolStatusService tools, IFfmpegLocator ffmpeg, IPluginPaths paths)
+    {
+        _tools = tools ?? throw new ArgumentNullException(nameof(tools));
+        _ffmpeg = ffmpeg ?? throw new ArgumentNullException(nameof(ffmpeg));
+        _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+    }
+
+    /// <inheritdoc />
+    public async Task<ProcessRequest> CreateAsync(IEnumerable<string> options, MediaUrl url, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(url);
+
+        var ytDlp = await _tools.GetStatusAsync(ToolKind.YtDlp, cancellationToken).ConfigureAwait(false);
+        if (ytDlp.State != ToolState.Ready)
+        {
+            throw new ToolNotReadyException(NotReadyMessage(ytDlp));
+        }
+
+        var arguments = new List<string>
+        {
+            // Ignore any yt-dlp config file on the server: TubeDLFin's options must be the only ones.
+            "--ignore-config",
+            "--no-color",
+            "--cache-dir",
+            _paths.CacheDirectory,
+        };
+
+        // Without Deno, YouTube may offer fewer formats, but other sites work, so it's not required.
+        var deno = await _tools.GetStatusAsync(ToolKind.Deno, cancellationToken).ConfigureAwait(false);
+        if (deno.State == ToolState.Ready)
+        {
+            arguments.Add("--js-runtimes");
+            arguments.Add("deno:" + deno.Path);
+        }
+
+        var ffmpeg = _ffmpeg.GetStatus();
+        if (ffmpeg.Found)
+        {
+            arguments.Add("--ffmpeg-location");
+            arguments.Add(ffmpeg.EncoderPath!);
+        }
+
+        arguments.AddRange(options);
+        arguments.Add("--");
+        arguments.Add(url.Value.AbsoluteUri);
+
+        return new ProcessRequest(ytDlp.Path, arguments);
+    }
+
+    private static string NotReadyMessage(ToolStatus ytDlp) => ytDlp.State switch
+    {
+        ToolState.NotInstalled => "yt-dlp is not installed yet. TubeDLFin installs it at server start; "
+            + "check Tools & settings, or press \"Update now\" there.",
+        ToolState.Unsupported => ytDlp.Message ?? "yt-dlp is not available for this system.",
+        _ => $"yt-dlp is not working: {ytDlp.Message ?? "unknown error"}. Check Tools & settings.",
+    };
+}

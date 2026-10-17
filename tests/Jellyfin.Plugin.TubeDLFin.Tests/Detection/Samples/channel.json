@@ -1,0 +1,683 @@
+{
+ "id": "@BlenderOfficial",
+ "channel": "Blender",
+ "channel_id": "UCSMOQeBJ2RAnuFungnQOxLg",
+ "title": "Blender",
+ "availability": "public",
+ "channel_follower_count": 1250000,
+ "description": "Official YouTube channel for Blender, the Free and Open Source 3D Creation Suite.\n\nThe Freedom to Create\n",
+ "tags": [
+  "blender",
+  "Blender Foundation",
+  "3d",
+  "free software",
+  "Creative Commons",
+  "tutorials",
+  "blender conference",
+  "sintel",
+  "cosmos laundromat",
+  "caminandes",
+  "tears of steel",
+  "elephants dream",
+  "big buck bunny"
+ ],
+ "thumbnails": [
+  {
+   "url": "https://yt3.googleusercontent.com/6pYvl5Jl7MszRRlhjlRuEfil7B1sgt3u4WbCCl7yHPv1LbsSVAcaoGfs3gyrJUM201DQnzrUOA=s0",
+   "id": "banner_uncropped",
+   "preference": -5
+  },
+  {
+   "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s900-c-k-c0x00ffffff-no-rj",
+   "height": 900,
+   "width": 900,
+   "id": "7",
+   "resolution": "900x900"
+  },
+  {
+   "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s0",
+   "id": "avatar_uncropped",
+   "preference": 1
+  }
+ ],
+ "uploader_id": "@BlenderOfficial",
+ "uploader_url": "https://www.youtube.com/@BlenderOfficial",
+ "channel_is_verified": true,
+ "modified_date": null,
+ "view_count": null,
+ "playlist_count": 3,
+ "uploader": "Blender",
+ "channel_url": "https://www.youtube.com/channel/UCSMOQeBJ2RAnuFungnQOxLg",
+ "_type": "playlist",
+ "entries": [
+  {
+   "id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "channel": "Blender",
+   "channel_id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "title": "Blender - Videos",
+   "availability": "public",
+   "channel_follower_count": 1250000,
+   "description": "Official YouTube channel for Blender, the Free and Open Source 3D Creation Suite.\n\nThe Freedom to Create\n",
+   "tags": [
+    "blender",
+    "Blender Foundation",
+    "3d",
+    "free software",
+    "Creative Commons",
+    "tutorials",
+    "blender conference",
+    "sintel",
+    "cosmos laundromat",
+    "caminandes",
+    "tears of steel",
+    "elephants dream",
+    "big buck bunny"
+   ],
+   "thumbnails": [
+    {
+     "url": "https://yt3.googleusercontent.com/6pYvl5Jl7MszRRlhjlRuEfil7B1sgt3u4WbCCl7yHPv1LbsSVAcaoGfs3gyrJUM201DQnzrUOA=s0",
+     "id": "banner_uncropped",
+     "preference": -5
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s900-c-k-c0x00ffffff-no-rj",
+     "height": 900,
+     "width": 900,
+     "id": "7",
+     "resolution": "900x900"
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s0",
+     "id": "avatar_uncropped",
+     "preference": 1
+    }
+   ],
+   "uploader_id": "@BlenderOfficial",
+   "uploader_url": "https://www.youtube.com/@BlenderOfficial",
+   "channel_is_verified": true,
+   "modified_date": null,
+   "view_count": null,
+   "playlist_count": null,
+   "uploader": "Blender",
+   "channel_url": "https://www.youtube.com/channel/UCSMOQeBJ2RAnuFungnQOxLg",
+   "_type": "playlist",
+   "entries": [
+    {
+     "title": "Blender Conference 2026 Recap",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/sO_lhW8av3U/hq720.jpg?sqp=-oaymwEcCOgCEMoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDuR0n6G8rK1ByMhmqfiJrLVi3S6A",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/sO_lhW8av3U/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLATSInaX-ioZnhhXqDUbtLJl2MELg",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 149,
+     "view_count": 17000,
+     "timestamp": null,
+     "live_status": null,
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "sO_lhW8av3U",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=sO_lhW8av3U",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "The Future of Rendering — BCON26",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/SVJiCL3K0j4/hq720.jpg?sqp=-oaymwEcCOgCEMoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDVpq4Er8DMMtbv-oTZ72wGsh8tfA",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/SVJiCL3K0j4/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLBwSTr0tf5Q-b9ULG9O8BuBqenH-A",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 1106,
+     "view_count": 26000,
+     "timestamp": null,
+     "live_status": null,
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "SVJiCL3K0j4",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=SVJiCL3K0j4",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "Subject Extraction for Scene Reconstruction in VFX — BCON26",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/TqP7Hyy_MFo/hq720.jpg?sqp=-oaymwEcCOgCEMoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLBiuXt2LSi-kXlAeiUB5TmrSWnneA",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/TqP7Hyy_MFo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLAK7HC24pG3PS6A8hBrND6Efzem5A",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 1418,
+     "view_count": 6200,
+     "timestamp": null,
+     "live_status": null,
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "TqP7Hyy_MFo",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=TqP7Hyy_MFo",
+     "__x_forwarded_for_ip": null
+    }
+   ],
+   "extractor_key": "YoutubeTab",
+   "extractor": "youtube:tab",
+   "webpage_url": "https://www.youtube.com/@BlenderOfficial/videos",
+   "__x_forwarded_for_ip": null,
+   "release_year": null,
+   "requested_entries": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+   ],
+   "__files_to_move": {}
+  },
+  {
+   "id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "channel": "Blender",
+   "channel_id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "title": "Blender - Live",
+   "availability": "public",
+   "channel_follower_count": 1250000,
+   "description": "Official YouTube channel for Blender, the Free and Open Source 3D Creation Suite.\n\nThe Freedom to Create\n",
+   "tags": [
+    "blender",
+    "Blender Foundation",
+    "3d",
+    "free software",
+    "Creative Commons",
+    "tutorials",
+    "blender conference",
+    "sintel",
+    "cosmos laundromat",
+    "caminandes",
+    "tears of steel",
+    "elephants dream",
+    "big buck bunny"
+   ],
+   "thumbnails": [
+    {
+     "url": "https://yt3.googleusercontent.com/6pYvl5Jl7MszRRlhjlRuEfil7B1sgt3u4WbCCl7yHPv1LbsSVAcaoGfs3gyrJUM201DQnzrUOA=s0",
+     "id": "banner_uncropped",
+     "preference": -5
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s900-c-k-c0x00ffffff-no-rj",
+     "height": 900,
+     "width": 900,
+     "id": "7",
+     "resolution": "900x900"
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s0",
+     "id": "avatar_uncropped",
+     "preference": 1
+    }
+   ],
+   "uploader_id": "@BlenderOfficial",
+   "uploader_url": "https://www.youtube.com/@BlenderOfficial",
+   "channel_is_verified": true,
+   "modified_date": null,
+   "view_count": null,
+   "playlist_count": null,
+   "uploader": "Blender",
+   "channel_url": "https://www.youtube.com/channel/UCSMOQeBJ2RAnuFungnQOxLg",
+   "_type": "playlist",
+   "entries": [
+    {
+     "title": "Huge SEQUENCER improvements, PROJECTS in Blender 5.3! - Blender Today LIVE #291",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/oMeecNng9TM/hq720.jpg?sqp=-oaymwE2COgCEMoBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhlIE8oTjAP&rs=AOn4CLAUBBxbUPYr6Pidy4HZreo2ug1aww",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/oMeecNng9TM/hq720.jpg?sqp=-oaymwE2CNAFEJQDSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhlIE8oTjAP&rs=AOn4CLCGGyIF31m_byoFkLc8uZxOG0_deQ",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 6488,
+     "view_count": 27000,
+     "timestamp": null,
+     "live_status": "was_live",
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "oMeecNng9TM",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=oMeecNng9TM",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "GAUSSIAN SPLATS, DLSS, Outliner, and more! - Blender Today LIVE #290",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/x3znZU4YUME/hq720.jpg?sqp=-oaymwE2COgCEMoBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhlIFEoPTAP&rs=AOn4CLD9Z2uHgzROLnmw-L45ywlCLaY29Q",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/x3znZU4YUME/hq720.jpg?sqp=-oaymwE2CNAFEJQDSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhlIFEoPTAP&rs=AOn4CLANvtfMfBU9fPEroI55vSYWL-EPjw",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 5564,
+     "view_count": 30000,
+     "timestamp": null,
+     "live_status": "was_live",
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "x3znZU4YUME",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=x3znZU4YUME",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "EEVEE FISH EYE! 🐟 Blender Today LIVE #289",
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/E0-V2R1cMNE/hq720.jpg?sqp=-oaymwE2COgCEMoBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhLIFUoZTAP&rs=AOn4CLDIiD3qSdF9JQKc9iA22PCgxMwsbg",
+       "height": 202,
+       "width": 360
+      },
+      {
+       "url": "https://i.ytimg.com/vi/E0-V2R1cMNE/hq720.jpg?sqp=-oaymwE2CNAFEJQDSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhLIFUoZTAP&rs=AOn4CLDMyq1lJyM_TSLjMkPsN6rLZZAXew",
+       "height": 404,
+       "width": 720
+      }
+     ],
+     "duration": 5415,
+     "view_count": 29000,
+     "timestamp": null,
+     "live_status": "was_live",
+     "availability": null,
+     "channel_url": null,
+     "uploader_url": null,
+     "creators": null,
+     "ie_key": "Youtube",
+     "id": "E0-V2R1cMNE",
+     "_type": "url",
+     "url": "https://www.youtube.com/watch?v=E0-V2R1cMNE",
+     "__x_forwarded_for_ip": null
+    }
+   ],
+   "extractor_key": "YoutubeTab",
+   "extractor": "youtube:tab",
+   "webpage_url": "https://www.youtube.com/@BlenderOfficial/streams",
+   "__x_forwarded_for_ip": null,
+   "release_year": null,
+   "requested_entries": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+   ],
+   "__files_to_move": {}
+  },
+  {
+   "id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "channel": "Blender",
+   "channel_id": "UCSMOQeBJ2RAnuFungnQOxLg",
+   "title": "Blender - Shorts",
+   "availability": "public",
+   "channel_follower_count": 1250000,
+   "description": "Official YouTube channel for Blender, the Free and Open Source 3D Creation Suite.\n\nThe Freedom to Create\n",
+   "tags": [
+    "blender",
+    "Blender Foundation",
+    "3d",
+    "free software",
+    "Creative Commons",
+    "tutorials",
+    "blender conference",
+    "sintel",
+    "cosmos laundromat",
+    "caminandes",
+    "tears of steel",
+    "elephants dream",
+    "big buck bunny"
+   ],
+   "thumbnails": [
+    {
+     "url": "https://yt3.googleusercontent.com/6pYvl5Jl7MszRRlhjlRuEfil7B1sgt3u4WbCCl7yHPv1LbsSVAcaoGfs3gyrJUM201DQnzrUOA=s0",
+     "id": "banner_uncropped",
+     "preference": -5
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s900-c-k-c0x00ffffff-no-rj",
+     "height": 900,
+     "width": 900,
+     "id": "7",
+     "resolution": "900x900"
+    },
+    {
+     "url": "https://yt3.googleusercontent.com/ytc/AIdro_nqhez5E1j4YzrCvzTAAB6z_KDFFZznqWv0x-vfY2gsXdY=s0",
+     "id": "avatar_uncropped",
+     "preference": 1
+    }
+   ],
+   "uploader_id": "@BlenderOfficial",
+   "uploader_url": "https://www.youtube.com/@BlenderOfficial",
+   "channel_is_verified": true,
+   "modified_date": null,
+   "view_count": null,
+   "playlist_count": 33,
+   "uploader": "Blender",
+   "channel_url": "https://www.youtube.com/channel/UCSMOQeBJ2RAnuFungnQOxLg",
+   "_type": "playlist",
+   "entries": [
+    {
+     "title": "BLENDERHEADS - Ep. 13 teaser #shorts",
+     "view_count": 14000,
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/A9Yn8Ad_cH8/oar3.jpg?sqp=-oaymwEdCJUDENAFSFWQAgHyq4qpAwwIARUAAIhCcAHAAQY=&rs=AOn4CLDzyKoctiGR2qNDSU1KecfLgke0BA",
+       "height": 720,
+       "width": 405
+      },
+      {
+       "url": "https://i.ytimg.com/vi/A9Yn8Ad_cH8/oar3.jpg?sqp=-oaymwEgCJUDEOAESFWQAgHyq4qpAw8IARUAAIhCcAHAAQbIAQE=&rs=AOn4CLAz23SLsz6HImo547R8lkdQc3bj3A",
+       "height": 608,
+       "width": 405
+      }
+     ],
+     "ie_key": "Youtube",
+     "id": "A9Yn8Ad_cH8",
+     "_type": "url",
+     "url": "https://www.youtube.com/shorts/A9Yn8Ad_cH8",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "Stay in touch with your Blender 🫆",
+     "view_count": 91000,
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/bchuTN1Hrd0/oardefault.jpg?sqp=-oaymwEdCJUDENAFSFWQAgHyq4qpAwwIARUAAIhCcAHAAQY=&rs=AOn4CLCM9zqw9R30ugGqXdR4Um8-tBzW2g",
+       "height": 720,
+       "width": 405
+      },
+      {
+       "url": "https://i.ytimg.com/vi/bchuTN1Hrd0/oardefault.jpg?sqp=-oaymwEgCJUDEOAESFWQAgHyq4qpAw8IARUAAIhCcAHAAQbIAQE=&rs=AOn4CLCSr7HixKMUM9btk5M0h6xZomomUA",
+       "height": 608,
+       "width": 405
+      }
+     ],
+     "ie_key": "Youtube",
+     "id": "bchuTN1Hrd0",
+     "_type": "url",
+     "url": "https://www.youtube.com/shorts/bchuTN1Hrd0",
+     "__x_forwarded_for_ip": null
+    },
+    {
+     "title": "Blender 5.2 LTS Showcase Reel #b3d",
+     "view_count": 23000,
+     "thumbnails": [
+      {
+       "url": "https://i.ytimg.com/vi/tmIYg5NQTrk/oardefault.jpg?sqp=-oaymwEdCJUDENAFSFWQAgHyq4qpAwwIARUAAIhCcAHAAQY=&rs=AOn4CLDF1px_ZitoVmFqzb-8SLcOJLOOBQ",
+       "height": 720,
+       "width": 405
+      },
+      {
+       "url": "https://i.ytimg.com/vi/tmIYg5NQTrk/oardefault.jpg?sqp=-oaymwEgCJUDEOAESFWQAgHyq4qpAw8IARUAAIhCcAHAAQbIAQE=&rs=AOn4CLBcVhT7iiCPYL1KwgeISxfhOB1qRA",
+       "height": 608,
+       "width": 405
+      }
+     ],
+     "ie_key": "Youtube",
+     "id": "tmIYg5NQTrk",
+     "_type": "url",
+     "url": "https://www.youtube.com/shorts/tmIYg5NQTrk",
+     "__x_forwarded_for_ip": null
+    }
+   ],
+   "extractor_key": "YoutubeTab",
+   "extractor": "youtube:tab",
+   "webpage_url": "https://www.youtube.com/@BlenderOfficial/shorts",
+   "__x_forwarded_for_ip": null,
+   "release_year": null,
+   "__files_to_move": {}
+  }
+ ],
+ "webpage_url": "https://www.youtube.com/@BlenderOfficial",
+ "original_url": "https://www.youtube.com/@BlenderOfficial",
+ "webpage_url_basename": "@BlenderOfficial",
+ "webpage_url_domain": "youtube.com",
+ "extractor": "youtube:tab",
+ "extractor_key": "YoutubeTab",
+ "release_year": null,
+ "__files_to_move": {},
+ "_version": {
+  "version": "2026.08.19",
+  "current_git_head": null,
+  "release_git_head": null,
+  "repository": "yt-dlp/yt-dlp"
+ }
+}

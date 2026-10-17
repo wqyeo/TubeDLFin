@@ -1,5 +1,6 @@
 using System;
 using Jellyfin.Plugin.TubeDLFin.Configuration;
+using Jellyfin.Plugin.TubeDLFin.Detection;
 using Jellyfin.Plugin.TubeDLFin.Platform;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Status;
@@ -9,6 +10,7 @@ using Jellyfin.Plugin.TubeDLFin.Tools.Installation;
 using Jellyfin.Plugin.TubeDLFin.Tools.Releases;
 using Jellyfin.Plugin.TubeDLFin.Tools.Status;
 using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
+using Jellyfin.Plugin.TubeDLFin.YtDlp;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,9 @@ namespace Jellyfin.Plugin.TubeDLFin;
 /// </summary>
 public class PluginServiceRegistrator : IPluginServiceRegistrator
 {
+    // Each detection is a yt-dlp process; keep a Raspberry Pi responsive.
+    private const int MaxConcurrentProbes = 2;
+
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
@@ -46,5 +51,14 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IToolUpdateService, ToolUpdateService>();
         serviceCollection.AddSingleton<IFfmpegLocator, JellyfinFfmpegLocator>();
         serviceCollection.AddSingleton<IToolStatusService, ToolStatusService>();
+
+        // yt-dlp
+        serviceCollection.AddSingleton<IYtDlpCommandFactory, YtDlpCommandFactory>();
+
+        // Detection: add a site's "video in a playlist" links by registering another inspector.
+        serviceCollection.AddSingleton<IPlaylistLinkInspector, YouTubePlaylistLinkInspector>();
+        serviceCollection.AddSingleton<IProbeResultParser, ProbeResultParser>();
+        serviceCollection.AddSingleton<IMediaProber>(services =>
+            new ThrottledMediaProber(ActivatorUtilities.CreateInstance<YtDlpMediaProber>(services), MaxConcurrentProbes));
     }
 }

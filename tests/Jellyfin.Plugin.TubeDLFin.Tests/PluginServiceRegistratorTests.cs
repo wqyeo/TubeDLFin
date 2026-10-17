@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using Jellyfin.Plugin.TubeDLFin.Detection;
 using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
 using Jellyfin.Plugin.TubeDLFin.Tools.Status;
 using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
@@ -39,6 +40,7 @@ public class PluginServiceRegistratorTests
         Assert.All(ours, d => Assert.NotNull(provider.GetRequiredService(d.ServiceType)));
         Assert.Equal(2, provider.GetRequiredService<IToolDefinitionRegistry>().All.Count);
         Assert.IsType<CachingToolVersionProbe>(provider.GetRequiredService<IToolVersionProbe>());
+        Assert.IsType<ThrottledMediaProber>(provider.GetRequiredService<IMediaProber>());
         Assert.NotNull(new UpdateToolsTask(provider.GetRequiredService<IToolUpdateService>()));
     }
 }

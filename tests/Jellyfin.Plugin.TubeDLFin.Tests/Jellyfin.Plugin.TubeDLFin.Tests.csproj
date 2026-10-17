@@ -25,6 +25,7 @@
     <None Include="../../build.yaml" Link="build.yaml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Directory.Build.props" Link="Directory.Build.props.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../web/src/plugin.ts" Link="plugin.ts.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Detection/Samples/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

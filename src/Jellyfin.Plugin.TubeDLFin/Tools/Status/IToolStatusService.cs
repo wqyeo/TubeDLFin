@@ -14,4 +14,12 @@ public interface IToolStatusService
     /// <param name="cancellationToken">Cancels the check.</param>
     /// <returns>The overview.</returns>
     Task<ToolsOverview> GetOverviewAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Checks one tool.
+    /// </summary>
+    /// <param name="kind">The tool.</param>
+    /// <param name="cancellationToken">Cancels the check.</param>
+    /// <returns>The tool's status.</returns>
+    Task<ToolStatus> GetStatusAsync(ToolKind kind, CancellationToken cancellationToken);
 }

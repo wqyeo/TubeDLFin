@@ -1,0 +1,79 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Jellyfin.Plugin.TubeDLFin.Platform;
+using Jellyfin.Plugin.TubeDLFin.Tests.TestSupport;
+using Jellyfin.Plugin.TubeDLFin.Tools;
+using Jellyfin.Plugin.TubeDLFin.Tools.Status;
+using Jellyfin.Plugin.TubeDLFin.YtDlp;
+using NSubstitute;
+using Xunit;
+
+namespace Jellyfin.Plugin.TubeDLFin.Tests.YtDlp;
+
+public class YtDlpCommandFactoryTests
+{
+    private static readonly MediaUrl Url = Urls.Media("https://www.youtube.com/watch?v=jNQXAC9IVRw");
+
+    private readonly IToolStatusService _tools = Substitute.For<IToolStatusService>();
+    private readonly IFfmpegLocator _ffmpeg = Substitute.For<IFfmpegLocator>();
+    private readonly IPluginPaths _paths = Substitute.For<IPluginPaths>();
+    private readonly YtDlpCommandFactory _factory;
+
+    public YtDlpCommandFactoryTests()
+    {
+        _paths.CacheDirectory.Returns("/data/tubedlfin/cache");
+        SetTool(ToolKind.YtDlp, ToolState.Ready, "/data/tubedlfin/bin/yt-dlp");
+        SetTool(ToolKind.Deno, ToolState.Ready, "/data/tubedlfin/bin/deno");
+        _ffmpeg.GetStatus().Returns(new FfmpegStatus("/usr/lib/jellyfin-ffmpeg/ffmpeg", null, null));
+        _factory = new YtDlpCommandFactory(_tools, _ffmpeg, _paths);
+    }
+
+    [Fact]
+    public async Task CreateAsync_AllToolsReady_BuildsFullCommand()
+    {
+        var request = await _factory.CreateAsync(["--dump-single-json"], Url, TestContext.Current.CancellationToken);
+
+        Assert.Equal("/data/tubedlfin/bin/yt-dlp", request.FileName);
+        Assert.Equal(
+            [
+                "--ignore-config", "--no-color", "--cache-dir", "/data/tubedlfin/cache",
+                "--js-runtimes", "deno:/data/tubedlfin/bin/deno",
+                "--ffmpeg-location", "/usr/lib/jellyfin-ffmpeg/ffmpeg",
+                "--dump-single-json",
+                "--", "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+            ],
+            request.Arguments);
+    }
+
+    [Fact]
+    public async Task CreateAsync_DenoBrokenAndNoFfmpeg_LeavesThemOut()
+    {
+        SetTool(ToolKind.Deno, ToolState.Broken, "/data/tubedlfin/bin/deno");
+        _ffmpeg.GetStatus().Returns(new FfmpegStatus(null, null, null));
+
+        var request = await _factory.CreateAsync([], Url, TestContext.Current.CancellationToken);
+
+        Assert.DoesNotContain("--js-runtimes", request.Arguments);
+        Assert.DoesNotContain("--ffmpeg-location", request.Arguments);
+        Assert.Equal(["--", Url.Value.AbsoluteUri], request.Arguments.TakeLast(2));
+    }
+
+    [Theory]
+    [InlineData(ToolState.NotInstalled, "not installed yet")]
+    [InlineData(ToolState.Broken, "not working: Exec format error")]
+    [InlineData(ToolState.Unsupported, "Exec format error")]
+    public async Task CreateAsync_YtDlpNotReady_Throws(ToolState state, string expected)
+    {
+        SetTool(ToolKind.YtDlp, state, "/data/tubedlfin/bin/yt-dlp", "Exec format error");
+
+        var ex = await Assert.ThrowsAsync<ToolNotReadyException>(() => _factory.CreateAsync([], Url, TestContext.Current.CancellationToken));
+
+        Assert.Contains(expected, ex.Message, StringComparison.Ordinal);
+    }
+
+    private void SetTool(ToolKind kind, ToolState state, string path, string? message = null) =>
+        _tools.GetStatusAsync(kind, Arg.Any<CancellationToken>())
+            .Returns(new ToolStatus(kind, kind.ToString(), state, null, path, IsCustom: false, message));
+}
