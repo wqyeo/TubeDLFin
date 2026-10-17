@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Jellyfin.Plugin.TubeDLFin.Downloads;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Tests.TestSupport;
 using Xunit;
@@ -17,9 +18,19 @@ public class DownloadOptionSetTests
             [
                 "--paths", "/media/movies", "--paths", "temp:/data/tmp/downloads/job1",
                 "--output", "%(uploader,channel,creator|Unknown)s/%(title)s [%(id)s].%(ext)s",
+                "--output", "thumbnail:%(uploader,channel,creator|Unknown)s/%(title)s [%(id)s]-poster.%(ext)s",
                 "--no-mtime", "--windows-filenames", "--trim-filenames", "150",
             ],
-            Apply(new OutputOptions(), DownloadPlans.Create()));
+            Apply(new OutputOptions(Naming.Catalog()), DownloadPlans.Create()));
+    }
+
+    [Fact]
+    public void Output_UsesChosenPreset()
+    {
+        var arguments = Apply(new OutputOptions(Naming.Catalog()), DownloadPlans.Create(new DownloadProfile { Naming = NamingPresetId.MovieFolder }));
+
+        Assert.Contains("%(title)s [%(id)s]/%(title)s [%(id)s].%(ext)s", arguments);
+        Assert.Contains("thumbnail:%(title)s [%(id)s]/poster.%(ext)s", arguments);
     }
 
     [Fact]

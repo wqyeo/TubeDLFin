@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using Jellyfin.Plugin.TubeDLFin.Detection;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
@@ -49,7 +50,8 @@ public class PluginServiceRegistratorTests
         Assert.IsType<ThrottledMediaProber>(provider.GetRequiredService<IMediaProber>());
         Assert.Same(provider.GetRequiredService<IDownloadManager>(), provider.GetRequiredService<IDownloadJobSource>());
         Assert.Contains(provider.GetServices<IHostedService>(), s => s is DownloadDispatcher);
-        Assert.Equal(6, provider.GetServices<IDownloadOptionSet>().Count());
+        Assert.Equal(9, provider.GetServices<IDownloadOptionSet>().Count());
+        Assert.IsType<LibraryRefreshStep>(provider.GetServices<IFinishedItemStep>().Last());
         Assert.NotNull(new UpdateToolsTask(provider.GetRequiredService<IToolUpdateService>()));
     }
 }

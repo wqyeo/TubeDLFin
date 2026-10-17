@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Processes;
@@ -46,7 +47,7 @@ public sealed class YtDlpOutputParser : IYtDlpOutputParser
         if (text.StartsWith(DownloadMarkers.Done, StringComparison.Ordinal))
         {
             return Json(text[DownloadMarkers.Done.Length..], info =>
-                info.String("filepath") is { } path ? new ItemFinishedEvent(info.String("id"), info.String("title"), path) : null);
+                info.String("filepath") is { } path ? new ItemFinishedEvent(Item(info, path)) : null);
         }
 
         if (YtDlpMessages.Error(text) is { } error)
@@ -60,6 +61,28 @@ public sealed class YtDlpOutputParser : IYtDlpOutputParser
         }
 
         return null;
+    }
+
+    private static DownloadedItem Item(JsonElement info, string path)
+    {
+        var artists = info.Strings("artists").ToList();
+        return new DownloadedItem(path)
+        {
+            Id = info.String("id"),
+            Title = info.String("title"),
+            Description = info.String("description"),
+            UploadDate = DateOnly.TryParseExact(info.String("upload_date"), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date : null,
+            Timestamp = info.Number("timestamp") is { } seconds && seconds is > 0 and < 253402300800 ? DateTimeOffset.FromUnixTimeSeconds((long)seconds) : null,
+            Uploader = info.String("uploader") ?? info.String("channel"),
+            Duration = info.Number("duration"),
+            Extractor = info.String("extractor_key"),
+            Artist = artists.Count > 0 ? string.Join(", ", artists) : info.String("artist"),
+            Album = info.String("album"),
+            Track = info.String("track"),
+            ReleaseYear = info.Integer("release_year"),
+            PlaylistTitle = info.String("playlist_title"),
+            PlaylistIndex = info.Integer("playlist_index"),
+        };
     }
 
     private static ProgressEvent? Progress(string text)

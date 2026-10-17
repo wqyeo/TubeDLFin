@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
-using Jellyfin.Plugin.TubeDLFin.Libraries;
 using Jellyfin.Plugin.TubeDLFin.Platform;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Tools;
@@ -25,8 +26,8 @@ public sealed partial class DownloadRunner : IDownloadRunner
     private readonly IYtDlpCommandFactory _commands;
     private readonly IProcessRunner _processRunner;
     private readonly IYtDlpOutputParser _parser;
-    private readonly ILibraryNotifier _notifier;
-    private readonly IDownloadErrorExplainer _explainer;
+    private readonly IEnumerable<IFinishedItemStep> _finishingSteps;
+    private readonly IYtDlpErrorExplainer _explainer;
     private readonly IPluginPaths _paths;
     private readonly TimeProvider _time;
     private readonly ILogger<DownloadRunner> _logger;
@@ -38,7 +39,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
     /// <param name="commands">Builds the yt-dlp command.</param>
     /// <param name="processRunner">Runs yt-dlp.</param>
     /// <param name="parser">Reads yt-dlp's output.</param>
-    /// <param name="notifier">Tells Jellyfin about new files.</param>
+    /// <param name="finishingSteps">Run on each finished file, in order (the last tells Jellyfin).</param>
     /// <param name="explainer">Turns errors into advice.</param>
     /// <param name="paths">The plugin's folders.</param>
     /// <param name="time">The clock.</param>
@@ -48,8 +49,8 @@ public sealed partial class DownloadRunner : IDownloadRunner
         IYtDlpCommandFactory commands,
         IProcessRunner processRunner,
         IYtDlpOutputParser parser,
-        ILibraryNotifier notifier,
-        IDownloadErrorExplainer explainer,
+        IEnumerable<IFinishedItemStep> finishingSteps,
+        IYtDlpErrorExplainer explainer,
         IPluginPaths paths,
         TimeProvider time,
         ILogger<DownloadRunner> logger)
@@ -58,7 +59,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _processRunner = processRunner ?? throw new ArgumentNullException(nameof(processRunner));
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
-        _notifier = notifier ?? throw new ArgumentNullException(nameof(notifier));
+        _finishingSteps = finishingSteps ?? throw new ArgumentNullException(nameof(finishingSteps));
         _explainer = explainer ?? throw new ArgumentNullException(nameof(explainer));
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
         _time = time ?? throw new ArgumentNullException(nameof(time));
@@ -155,7 +156,27 @@ public sealed partial class DownloadRunner : IDownloadRunner
         job.Apply(ytDlpEvent);
         if (ytDlpEvent is ItemFinishedEvent finished)
         {
-            _notifier.FileAdded(job.Plan.Library, finished.FilePath);
+            Finish(job, finished.Item);
+        }
+    }
+
+    // A failing step (say, an .nfo that can't be written) is noted in the job's log; the file
+    // itself is fine, so the job goes on and the remaining steps still run.
+    private void Finish(DownloadJob job, DownloadedItem item)
+    {
+        foreach (var step in _finishingSteps)
+        {
+            try
+            {
+                step.Run(job.Plan, item);
+            }
+#pragma warning disable CA1031 // Reported in the job's log; must not stop the download.
+            catch (Exception ex)
+#pragma warning restore CA1031
+            {
+                LogStepFailed(ex, step.GetType().Name, item.FilePath);
+                job.AppendLog($"TubeDLFin: {step.GetType().Name} failed for {item.FilePath}: {ex.Message}");
+            }
         }
     }
 
@@ -182,6 +203,9 @@ public sealed partial class DownloadRunner : IDownloadRunner
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Download {JobId} failed unexpectedly")]
     private partial void LogUnexpected(Exception exception, Guid jobId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "{Step} failed for {Path}")]
+    private partial void LogStepFailed(Exception exception, string step, string path);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not delete the temp folder {Path}")]
     private partial void LogTempNotDeleted(Exception exception, string path);

@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Jellyfin.Plugin.TubeDLFin.Downloads;
+namespace Jellyfin.Plugin.TubeDLFin.YtDlp;
 
 /// <summary>
-/// <see cref="IDownloadErrorExplainer"/> for the problems admins run into most.
+/// <see cref="IYtDlpErrorExplainer"/> for the problems admins run into most.
 /// </summary>
-public sealed class DownloadErrorExplainer : IDownloadErrorExplainer
+public sealed class YtDlpErrorExplainer : IYtDlpErrorExplainer
 {
     private static readonly IReadOnlyList<(string Match, string Explanation)> _explanations =
     [
@@ -15,7 +15,8 @@ public sealed class DownloadErrorExplainer : IDownloadErrorExplainer
         ("Permission denied", "Jellyfin may not write to the library folder. Check the folder's owner and permissions (PUID/PGID in Docker)."),
         ("Access to the path", "Jellyfin may not write to the library folder. Check the folder's owner and permissions (PUID/PGID in Docker)."),
         ("No space left on device", "The disk is full."),
-        ("Sign in to confirm", "YouTube wants this server to sign in (this happens on VPS and data-centre IP addresses)."),
+        ("Sign in to confirm", "YouTube wants this server to sign in (common on VPS and data-centre IP addresses). Set a cookies file under Tools & settings."),
+        ("cookies", "Check the cookies file set under Tools & settings."),
         ("HTTP Error 429", "The site is rate-limiting this server. Try again later."),
     ];
 

@@ -38,7 +38,7 @@ public class YtDlpMediaProberTests
         _runner.RunAsync(Arg.Do<ProcessRequest>(r => _started = r), Arg.Any<CancellationToken>())
             .Returns(new ProcessResult(0, Samples.Read("video"), string.Empty, TimedOut: false));
 
-        _prober = new YtDlpMediaProber(_commands, _runner, new ProbeResultParser(), [_inspector], NullLogger<YtDlpMediaProber>.Instance);
+        _prober = new YtDlpMediaProber(_commands, _runner, new ProbeResultParser(), [_inspector], new YtDlpErrorExplainer(), NullLogger<YtDlpMediaProber>.Instance);
     }
 
     [Fact]

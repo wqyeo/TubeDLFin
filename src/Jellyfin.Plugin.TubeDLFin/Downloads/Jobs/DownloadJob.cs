@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
 using Jellyfin.Plugin.TubeDLFin.Processes;
+using Jellyfin.Plugin.TubeDLFin.YtDlp;
 
 namespace Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
 
@@ -176,8 +177,8 @@ public sealed class DownloadJob : IDisposable
                     _state = DownloadState.Processing;
                     break;
                 case ItemFinishedEvent finished:
-                    _files.Add(finished.FilePath);
-                    _title ??= finished.Title;
+                    _files.Add(finished.Item.FilePath);
+                    _title ??= finished.Item.Title;
                     break;
                 case ItemSkippedEvent:
                     _skippedItems++;
@@ -226,7 +227,7 @@ public sealed class DownloadJob : IDisposable
     /// <param name="exit">How yt-dlp ended.</param>
     /// <param name="explainer">Turns errors into messages for the admin.</param>
     /// <param name="now">The current time.</param>
-    public void Complete(ProcessExit exit, IDownloadErrorExplainer explainer, DateTimeOffset now)
+    public void Complete(ProcessExit exit, IYtDlpErrorExplainer explainer, DateTimeOffset now)
     {
         ArgumentNullException.ThrowIfNull(exit);
         ArgumentNullException.ThrowIfNull(explainer);

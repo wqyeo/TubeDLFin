@@ -25,4 +25,17 @@ public class PluginConfiguration : BasePluginConfiguration
     /// merging and converting use the CPU.
     /// </summary>
     public int MaxConcurrentDownloads { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the path of a cookies file (Netscape format) for yt-dlp, for age-restricted or
+    /// members-only videos and when YouTube asks the server to sign in. Blank means none.
+    /// yt-dlp also writes refreshed cookies back to it.
+    /// </summary>
+    public string CookiesFile { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets extra yt-dlp arguments added to every run, e.g. <c>--limit-rate 5M</c>.
+    /// Quotes group words: <c>--proxy "socks5://host:1080"</c>.
+    /// </summary>
+    public string ExtraArguments { get; set; } = string.Empty;
 }

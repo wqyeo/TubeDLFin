@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
 using Jellyfin.Plugin.TubeDLFin.Libraries;
 using Jellyfin.Plugin.TubeDLFin.YtDlp;
 
@@ -110,6 +111,27 @@ public sealed partial class DownloadRequestValidator : IDownloadRequestValidator
         {
             errors.Add($"Audio quality must be one of {string.Join(", ", AudioQualities)} kbit/s or best.");
         }
+
+        var languages = profile.Subtitles?.Languages?.Replace(" ", string.Empty, StringComparison.Ordinal);
+        if (!string.IsNullOrEmpty(languages) && !SubtitleLanguagesPattern().IsMatch(languages))
+        {
+            errors.Add("Subtitle languages must be codes separated by commas, e.g. \"en,de\", \"en.*\" or \"all\".");
+        }
+
+        if (profile.SponsorBlock is { } sponsorBlock
+            && (!Enum.IsDefined(sponsorBlock.Mode) || sponsorBlock.Categories is null || !sponsorBlock.Categories.All(Enum.IsDefined)))
+        {
+            errors.Add("Unknown SponsorBlock option.");
+        }
+
+        if (!Enum.IsDefined(profile.Naming))
+        {
+            errors.Add("Unknown naming preset.");
+        }
+        else if (profile.Naming == NamingPresetId.Custom && CustomTemplateRules.Check(profile.CustomTemplate) is { } templateError)
+        {
+            errors.Add(templateError);
+        }
     }
 
     // The library folder must be one of the library's, and the subfolder must not lead out of it.
@@ -149,6 +171,10 @@ public sealed partial class DownloadRequestValidator : IDownloadRequestValidator
     }
 
     private static string? Blank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    // yt-dlp's --sub-langs: codes or regular expressions ("en", "pt-BR", "en.*"), "all", or "-code" to exclude.
+    [GeneratedRegex(@"^-?[A-Za-z0-9][A-Za-z0-9_.*+-]{0,29}(?:,-?[A-Za-z0-9][A-Za-z0-9_.*+-]{0,29}){0,29}$", RegexOptions.CultureInvariant)]
+    private static partial Regex SubtitleLanguagesPattern();
 
     // yt-dlp format ids: "137", "251-drc", "hls_aac_160k", "dash-video=1080".
     [GeneratedRegex(@"^[A-Za-z0-9][A-Za-z0-9._=-]{0,79}$", RegexOptions.CultureInvariant)]

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.TubeDLFin.Configuration;
 using Jellyfin.Plugin.TubeDLFin.Platform;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Tools;
@@ -17,6 +19,7 @@ public sealed class YtDlpCommandFactory : IYtDlpCommandFactory
     private readonly IToolStatusService _tools;
     private readonly IFfmpegLocator _ffmpeg;
     private readonly IPluginPaths _paths;
+    private readonly IPluginConfigurationProvider _configuration;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="YtDlpCommandFactory"/> class.
@@ -24,11 +27,13 @@ public sealed class YtDlpCommandFactory : IYtDlpCommandFactory
     /// <param name="tools">Reports whether yt-dlp and Deno work.</param>
     /// <param name="ffmpeg">Finds Jellyfin's FFmpeg.</param>
     /// <param name="paths">The plugin's folders.</param>
-    public YtDlpCommandFactory(IToolStatusService tools, IFfmpegLocator ffmpeg, IPluginPaths paths)
+    /// <param name="configuration">The settings (cookies file, extra arguments).</param>
+    public YtDlpCommandFactory(IToolStatusService tools, IFfmpegLocator ffmpeg, IPluginPaths paths, IPluginConfigurationProvider configuration)
     {
         _tools = tools ?? throw new ArgumentNullException(nameof(tools));
         _ffmpeg = ffmpeg ?? throw new ArgumentNullException(nameof(ffmpeg));
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     /// <inheritdoc />
@@ -67,7 +72,31 @@ public sealed class YtDlpCommandFactory : IYtDlpCommandFactory
             arguments.Add(ffmpeg.EncoderPath!);
         }
 
+        var settings = _configuration.Current;
+        if (!string.IsNullOrWhiteSpace(settings.CookiesFile))
+        {
+            var cookies = settings.CookiesFile.Trim();
+            if (!File.Exists(cookies))
+            {
+                throw new ToolNotReadyException($"The cookies file \"{cookies}\" set under Tools & settings does not exist.");
+            }
+
+            arguments.Add("--cookies");
+            arguments.Add(cookies);
+        }
+
         arguments.AddRange(options);
+
+        // The admin's own arguments come last, so they win over TubeDLFin's.
+        try
+        {
+            arguments.AddRange(ArgumentSplitter.Split(settings.ExtraArguments));
+        }
+        catch (FormatException ex)
+        {
+            throw new ToolNotReadyException(ex.Message + " Fix them under Tools & settings.", ex);
+        }
+
         arguments.Add("--");
         arguments.Add(url.Value.AbsoluteUri);
 

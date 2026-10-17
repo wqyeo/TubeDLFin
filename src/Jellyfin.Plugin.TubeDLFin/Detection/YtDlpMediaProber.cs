@@ -30,6 +30,7 @@ public sealed partial class YtDlpMediaProber : IMediaProber
     private readonly IProcessRunner _processRunner;
     private readonly IProbeResultParser _parser;
     private readonly IEnumerable<IPlaylistLinkInspector> _linkInspectors;
+    private readonly IYtDlpErrorExplainer _explainer;
     private readonly ILogger<YtDlpMediaProber> _logger;
 
     /// <summary>
@@ -39,18 +40,21 @@ public sealed partial class YtDlpMediaProber : IMediaProber
     /// <param name="processRunner">Runs yt-dlp.</param>
     /// <param name="parser">Reads yt-dlp's JSON.</param>
     /// <param name="linkInspectors">Recognise links to a video inside a playlist.</param>
+    /// <param name="explainer">Adds advice to yt-dlp's errors.</param>
     /// <param name="logger">The logger.</param>
     public YtDlpMediaProber(
         IYtDlpCommandFactory commands,
         IProcessRunner processRunner,
         IProbeResultParser parser,
         IEnumerable<IPlaylistLinkInspector> linkInspectors,
+        IYtDlpErrorExplainer explainer,
         ILogger<YtDlpMediaProber> logger)
     {
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _processRunner = processRunner ?? throw new ArgumentNullException(nameof(processRunner));
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         _linkInspectors = linkInspectors ?? throw new ArgumentNullException(nameof(linkInspectors));
+        _explainer = explainer ?? throw new ArgumentNullException(nameof(explainer));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -96,7 +100,7 @@ public sealed partial class YtDlpMediaProber : IMediaProber
         if (json.Length == 0 || json == "null")
         {
             LogRejected(url.Value, result.ExitCode, error ?? "no error message");
-            throw new ProbeFailedException(ProbeFailure.Rejected, error ?? $"yt-dlp exited with code {result.ExitCode} without saying why.");
+            throw new ProbeFailedException(ProbeFailure.Rejected, error is null ? $"yt-dlp exited with code {result.ExitCode} without saying why." : _explainer.Explain(error));
         }
 
         ProbeResult parsed;

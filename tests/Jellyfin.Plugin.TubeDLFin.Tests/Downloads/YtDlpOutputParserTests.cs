@@ -55,11 +55,40 @@ public class YtDlpOutputParserTests
     }
 
     [Fact]
-    public void Parse_ItemFinished()
+    public void Parse_ItemFinished_WithMetadata()
     {
+        const string Line =
+            """[tubedlfin:done]{"id": "d7woYjGWs6k", "title": "Da Funk", "filepath": "/media/music/Daft Punk/Homework/Da Funk.m4a", "description": "Provided to YouTube by Parlophone\n\nDa Funk", "upload_date": "20170209", "timestamp": 1486646534, "uploader": "Daft Punk", "duration": 329, "extractor_key": "Youtube", "artist": "Daft Punk", "artists": ["Daft Punk"], "album": "Homework", "track": "Da Funk", "release_year": 1996, "playlist_title": "Homework", "playlist_index": 7}""";
+
+        var finished = Assert.IsType<ItemFinishedEvent>(Parse(Line));
+
         Assert.Equal(
-            new ItemFinishedEvent("sO_lhW8av3U", "Blender Conference 2026 Recap", "/media/homevideos/YouTube/Blender/Blender Conference 2026 Recap [sO_lhW8av3U].mp4"),
-            Parse("""[tubedlfin:done]{"id": "sO_lhW8av3U", "title": "Blender Conference 2026 Recap", "filepath": "/media/homevideos/YouTube/Blender/Blender Conference 2026 Recap [sO_lhW8av3U].mp4"}"""));
+            new DownloadedItem("/media/music/Daft Punk/Homework/Da Funk.m4a")
+            {
+                Id = "d7woYjGWs6k",
+                Title = "Da Funk",
+                Description = "Provided to YouTube by Parlophone\n\nDa Funk",
+                UploadDate = new System.DateOnly(2017, 2, 9),
+                Timestamp = System.DateTimeOffset.FromUnixTimeSeconds(1486646534),
+                Uploader = "Daft Punk",
+                Duration = 329,
+                Extractor = "Youtube",
+                Artist = "Daft Punk",
+                Album = "Homework",
+                Track = "Da Funk",
+                ReleaseYear = 1996,
+                PlaylistTitle = "Homework",
+                PlaylistIndex = 7,
+            },
+            finished.Item);
+    }
+
+    [Fact]
+    public void Parse_ItemFinished_OnlyPath()
+    {
+        var finished = Assert.IsType<ItemFinishedEvent>(Parse("""[tubedlfin:done]{"id": "x", "filepath": "/media/a.mp4", "upload_date": "bad"}"""));
+
+        Assert.Equal(new DownloadedItem("/media/a.mp4") { Id = "x" }, finished.Item);
     }
 
     [Fact]

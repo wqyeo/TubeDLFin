@@ -2,7 +2,10 @@ using System;
 using Jellyfin.Plugin.TubeDLFin.Configuration;
 using Jellyfin.Plugin.TubeDLFin.Detection;
 using Jellyfin.Plugin.TubeDLFin.Downloads;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Nfo;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
 using Jellyfin.Plugin.TubeDLFin.Libraries;
@@ -42,6 +45,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IPluginPaths, PluginPaths>();
         serviceCollection.AddSingleton<IPluginConfigurationProvider, PluginConfigurationProvider>();
         serviceCollection.AddSingleton<IProcessRunner, ProcessRunner>();
+        serviceCollection.AddSingleton<IDiskSpaceProvider, DriveInfoDiskSpaceProvider>();
         serviceCollection.AddSingleton<IPluginInfoProvider, PluginInfoProvider>();
 
         // Tools: add a tool by registering another IToolDefinition.
@@ -59,6 +63,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
 
         // yt-dlp
         serviceCollection.AddSingleton<IYtDlpCommandFactory, YtDlpCommandFactory>();
+        serviceCollection.AddSingleton<IYtDlpErrorExplainer, YtDlpErrorExplainer>();
 
         // Detection: add a site's "video in a playlist" links by registering another inspector.
         serviceCollection.AddSingleton<IPlaylistLinkInspector, YouTubePlaylistLinkInspector>();
@@ -73,19 +78,40 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         // Downloads: add a group of yt-dlp options (subtitles, SponsorBlock, ...) by registering
         // another IDownloadOptionSet. They are applied in this order.
         serviceCollection.AddSingleton<IDownloadRequestValidator, DownloadRequestValidator>();
+
+        // Naming: add a preset by registering another NamingPreset. The first is the fallback.
+        serviceCollection.AddSingleton(NamingPresets.ChannelTitle);
+        serviceCollection.AddSingleton(NamingPresets.MovieFolder);
+        serviceCollection.AddSingleton(NamingPresets.TvShow);
+        serviceCollection.AddSingleton(NamingPresets.Playlist);
+        serviceCollection.AddSingleton(NamingPresets.MusicVideo);
+        serviceCollection.AddSingleton(NamingPresets.Music);
+        serviceCollection.AddSingleton<INamingPresetCatalog, NamingPresetCatalog>();
+
         serviceCollection.AddSingleton<IDownloadOptionSet, OutputOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, ProgressOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, ArchiveOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, PlaylistOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, VideoFormatOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, AudioFormatOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, ExtrasOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, SubtitleOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, SponsorBlockOptions>();
         serviceCollection.AddSingleton<IDownloadArgumentsBuilder, DownloadArgumentsBuilder>();
         serviceCollection.AddSingleton<IYtDlpOutputParser, YtDlpOutputParser>();
-        serviceCollection.AddSingleton<IDownloadErrorExplainer, DownloadErrorExplainer>();
         serviceCollection.AddSingleton<DownloadManager>();
         serviceCollection.AddSingleton<IDownloadManager>(services => services.GetRequiredService<DownloadManager>());
         serviceCollection.AddSingleton<IDownloadJobSource>(services => services.GetRequiredService<DownloadManager>());
         serviceCollection.AddSingleton<IDownloadRunner, DownloadRunner>();
+
+        // Finishing each file: add a step by registering another IFinishedItemStep (before the
+        // library refresh, which must come last). Add a library type's .nfo with an INfoBuilder.
+        serviceCollection.AddSingleton<INfoBuilder, MovieNfoBuilder>();
+        serviceCollection.AddSingleton<INfoBuilder, EpisodeNfoBuilder>();
+        serviceCollection.AddSingleton<INfoBuilder, MusicVideoNfoBuilder>();
+        serviceCollection.AddSingleton<IFinishedItemStep, SubtitleLanguageStep>();
+        serviceCollection.AddSingleton<IFinishedItemStep, NfoStep>();
+        serviceCollection.AddSingleton<IFinishedItemStep, LibraryRefreshStep>();
         serviceCollection.AddHostedService<DownloadDispatcher>();
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Jellyfin.Plugin.TubeDLFin.Downloads;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
 using Jellyfin.Plugin.TubeDLFin.Libraries;
 using Jellyfin.Plugin.TubeDLFin.Tests.TestSupport;
 using Xunit;
@@ -143,6 +144,58 @@ public class DownloadRequestValidatorTests
 
         Assert.Null(validation.Plan);
         Assert.Equal(["Enter a link.", "Choose the download options."], validation.Errors);
+    }
+
+    [Theory]
+    [InlineData(null, "Enter a custom file name template")]
+    [InlineData("%(title)s.mp4", "must end with")]
+    [InlineData("/etc/%(title)s.%(ext)s", "relative path")]
+    [InlineData("../%(title)s.%(ext)s", "relative path")]
+    [InlineData("a/../../%(title)s.%(ext)s", "relative path")]
+    [InlineData("C:%(title)s.%(ext)s", "relative path")]
+    [InlineData("%(title)s\n.%(ext)s", "one line")]
+    public void Validate_BadCustomTemplate_IsRefused(string? template, string expected)
+    {
+        var profile = Profile() with { Naming = NamingPresetId.Custom, CustomTemplate = template?.Replace("\\n", "\n", StringComparison.Ordinal) };
+
+        Assert.Contains(_validator.Validate(Request(profile: profile), Libraries).Errors, e => e.Contains(expected, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Validate_GoodCustomTemplate_IsAccepted()
+    {
+        var profile = Profile() with { Naming = NamingPresetId.Custom, CustomTemplate = "%(channel)s/%(upload_date>%Y)s/%(title)s.%(ext)s" };
+
+        Assert.True(_validator.Validate(Request(profile: profile), Libraries).IsValid);
+    }
+
+    [Fact]
+    public void Validate_UnknownPreset_IsRefused()
+    {
+        Assert.Contains("Unknown naming preset.", _validator.Validate(Request(profile: Profile() with { Naming = (NamingPresetId)99 }), Libraries).Errors);
+    }
+
+    [Theory]
+    [InlineData("en", true)]
+    [InlineData("en, de", true)]
+    [InlineData("en.*,pt-BR", true)]
+    [InlineData("all,-live_chat", true)]
+    [InlineData("en;rm", false)]
+    [InlineData("en,,de", false)]
+    [InlineData("--exec", false)]
+    public void Validate_SubtitleLanguages(string languages, bool valid)
+    {
+        var profile = Profile() with { Subtitles = new SubtitleChoice { Languages = languages } };
+
+        Assert.Equal(valid, _validator.Validate(Request(profile: profile), Libraries).IsValid);
+    }
+
+    [Fact]
+    public void Validate_UnknownSponsorBlockCategory_IsRefused()
+    {
+        var profile = Profile() with { SponsorBlock = new SponsorBlockChoice { Mode = SponsorBlockMode.Remove, Categories = [(SponsorBlockCategory)42] } };
+
+        Assert.Contains("Unknown SponsorBlock option.", _validator.Validate(Request(profile: profile), Libraries).Errors);
     }
 
     [Fact]

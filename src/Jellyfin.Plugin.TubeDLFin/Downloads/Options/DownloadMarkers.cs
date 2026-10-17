@@ -21,7 +21,7 @@ public static class DownloadMarkers
     public const string Start = "[tubedlfin:start]";
 
     /// <summary>
-    /// An item's final file is in place: JSON with id, title, filepath.
+    /// An item's final file is in place: JSON with its path and metadata (see <see cref="Output.DownloadedItem"/>).
     /// </summary>
     public const string Done = "[tubedlfin:done]";
 }

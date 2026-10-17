@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.TubeDLFin.Downloads;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
@@ -30,6 +31,7 @@ public sealed class DownloadRunnerTests : IDisposable
     private readonly IProcessRunner _processRunner = Substitute.For<IProcessRunner>();
     private readonly ILibraryNotifier _notifier = Substitute.For<ILibraryNotifier>();
     private readonly IPluginPaths _paths = Substitute.For<IPluginPaths>();
+    private readonly IFinishedItemStep _failingStep = Substitute.For<IFinishedItemStep>();
     private readonly DownloadRunner _runner;
     private readonly DownloadJob _job;
     private string? _tempSeenDuringRun;
@@ -47,12 +49,12 @@ public sealed class DownloadRunnerTests : IDisposable
             });
 
         _runner = new DownloadRunner(
-            new DownloadArgumentsBuilder([new OutputOptions(), new ArchiveOptions()]),
+            new DownloadArgumentsBuilder([new OutputOptions(Naming.Catalog()), new ArchiveOptions()]),
             _commands,
             _processRunner,
             new YtDlpOutputParser(),
-            _notifier,
-            new DownloadErrorExplainer(),
+            [new LibraryRefreshStep(_notifier), _failingStep],
+            new YtDlpErrorExplainer(),
             _paths,
             new ManualTimeProvider(Now),
             NullLogger<DownloadRunner>.Instance);
@@ -84,6 +86,20 @@ public sealed class DownloadRunnerTests : IDisposable
         Assert.Equal([file], info.Files);
         _notifier.Received(1).FileAdded(DownloadPlans.Movies, file);
         Assert.True(Directory.Exists(_job.Plan.Destination));
+    }
+
+    [Fact]
+    public async Task RunAsync_FailingStep_IsLoggedAndOthersRun()
+    {
+        var file = Path.Combine(_job.Plan.Destination, "a.mp4");
+        _failingStep.When(s => s.Run(Arg.Any<DownloadPlan>(), Arg.Any<DownloadedItem>())).Do(_ => throw new IOException("disk on fire"));
+        YtDlpPrints(0, $$"""[tubedlfin:done]{"id": "a", "filepath": "{{file}}"}""");
+
+        await _runner.RunAsync(_job, TestContext.Current.CancellationToken);
+
+        Assert.Equal(DownloadState.Completed, _job.Snapshot().State);
+        _notifier.Received(1).FileAdded(DownloadPlans.Movies, file);
+        Assert.Contains(_job.CopyLog(), line => line.Contains("disk on fire", StringComparison.Ordinal));
     }
 
     [Fact]

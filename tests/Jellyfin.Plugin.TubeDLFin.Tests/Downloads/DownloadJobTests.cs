@@ -4,6 +4,7 @@ using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Tests.TestSupport;
+using Jellyfin.Plugin.TubeDLFin.YtDlp;
 using Xunit;
 
 namespace Jellyfin.Plugin.TubeDLFin.Tests.Downloads;
@@ -14,7 +15,7 @@ public sealed class DownloadJobTests : IDisposable
     private static readonly ProcessExit Success = new(0, TimedOut: false);
     private static readonly ProcessExit Failure = new(1, TimedOut: false);
 
-    private readonly DownloadErrorExplainer _explainer = new();
+    private readonly YtDlpErrorExplainer _explainer = new();
     private readonly DownloadJob _job = new(Guid.NewGuid(), DownloadPlans.Create() with { Title = "Detected title" }, DownloadSources.Manual, Now);
 
     public void Dispose() => _job.Dispose();
@@ -41,7 +42,7 @@ public sealed class DownloadJobTests : IDisposable
         _job.Apply(new PostProcessEvent("Merger", "started"));
         Assert.Equal((DownloadState.Processing, "Merger", 100.0), (_job.Snapshot().State, _job.Snapshot().Stage, _job.Snapshot().Percent!.Value));
 
-        _job.Apply(new ItemFinishedEvent("a", "A", "/media/movies/x/A [a].mp4"));
+        _job.Apply(new ItemFinishedEvent(new DownloadedItem("/media/movies/x/A [a].mp4") { Id = "a", Title = "A" }));
         _job.Complete(Success, _explainer, Now.AddSeconds(5));
 
         var done = _job.Snapshot();
@@ -76,7 +77,7 @@ public sealed class DownloadJobTests : IDisposable
     public void SomeItemsFailed_CompletedWithErrors()
     {
         _job.TryStart(Now);
-        _job.Apply(new ItemFinishedEvent("a", "A", "/media/movies/A.mp4"));
+        _job.Apply(new ItemFinishedEvent(new DownloadedItem("/media/movies/A.mp4") { Id = "a", Title = "A" }));
         _job.Apply(new ErrorEvent("[youtube] b: Video unavailable"));
         _job.Complete(Failure, _explainer, Now);
 

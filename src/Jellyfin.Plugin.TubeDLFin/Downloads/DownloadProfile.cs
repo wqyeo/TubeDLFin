@@ -1,3 +1,5 @@
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
+
 namespace Jellyfin.Plugin.TubeDLFin.Downloads;
 
 /// <summary>
@@ -51,4 +53,29 @@ public sealed record DownloadProfile
     /// Gets an optional folder inside the library folder, e.g. <c>YouTube/Talks</c>.
     /// </summary>
     public string? Subfolder { get; init; }
+
+    /// <summary>
+    /// Gets how files are named inside the destination folder.
+    /// </summary>
+    public NamingPresetId Naming { get; init; }
+
+    /// <summary>
+    /// Gets the yt-dlp output template when <see cref="Naming"/> is <see cref="NamingPresetId.Custom"/>.
+    /// </summary>
+    public string? CustomTemplate { get; init; }
+
+    /// <summary>
+    /// Gets what is saved besides the media file.
+    /// </summary>
+    public DownloadExtras Extras { get; init; } = new();
+
+    /// <summary>
+    /// Gets which subtitles to download.
+    /// </summary>
+    public SubtitleChoice Subtitles { get; init; } = new();
+
+    /// <summary>
+    /// Gets what to do with sponsor segments.
+    /// </summary>
+    public SponsorBlockChoice SponsorBlock { get; init; } = new();
 }

@@ -29,6 +29,8 @@ public sealed class ProgressOptions : IDownloadOptionSet
         arguments.Add("--print");
         arguments.Add("before_dl:" + DownloadMarkers.Start + "%(.{id,title,playlist_index,n_entries,playlist_count})j");
         arguments.Add("--print");
-        arguments.Add("after_move:" + DownloadMarkers.Done + "%(.{id,title,filepath})j");
+        arguments.Add("after_move:" + DownloadMarkers.Done
+            + "%(.{id,title,filepath,description,upload_date,timestamp,uploader,channel,duration,extractor_key,"
+            + "artist,artists,album,track,release_year,playlist_title,playlist_index})j");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Jellyfin.Plugin.TubeDLFin.Downloads.Naming;
 
 namespace Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 
@@ -9,13 +10,19 @@ namespace Jellyfin.Plugin.TubeDLFin.Downloads.Options;
 /// </summary>
 public sealed class OutputOptions : IDownloadOptionSet
 {
-    /// <summary>
-    /// The file name template: <c>Channel/Title [id].ext</c>.
-    /// </summary>
-    public const string Template = "%(uploader,channel,creator|Unknown)s/%(title)s [%(id)s].%(ext)s";
-
     // Long titles in UTF-8 can pass the 255-byte file name limit; keep room for " [id].ext".
     private const string MaxFileNameLength = "150";
+
+    private readonly INamingPresetCatalog _naming;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OutputOptions"/> class.
+    /// </summary>
+    /// <param name="naming">Turns the profile's naming choice into templates.</param>
+    public OutputOptions(INamingPresetCatalog naming)
+    {
+        _naming = naming ?? throw new ArgumentNullException(nameof(naming));
+    }
 
     /// <inheritdoc />
     public void AddTo(IList<string> arguments, DownloadPlan plan, DownloadLocations locations)
@@ -28,8 +35,11 @@ public sealed class OutputOptions : IDownloadOptionSet
         arguments.Add(plan.Destination);
         arguments.Add("--paths");
         arguments.Add("temp:" + locations.TempDirectory);
+        var templates = _naming.Resolve(plan.Profile);
         arguments.Add("--output");
-        arguments.Add(Template);
+        arguments.Add(templates.Media);
+        arguments.Add("--output");
+        arguments.Add("thumbnail:" + templates.Thumbnail);
 
         // "Recently added" should sort by download time, not by the upload date.
         arguments.Add("--no-mtime");

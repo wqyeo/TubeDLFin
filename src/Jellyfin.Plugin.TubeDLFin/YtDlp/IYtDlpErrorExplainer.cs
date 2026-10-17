@@ -1,9 +1,9 @@
-namespace Jellyfin.Plugin.TubeDLFin.Downloads;
+namespace Jellyfin.Plugin.TubeDLFin.YtDlp;
 
 /// <summary>
 /// Turns yt-dlp's and the file system's errors into messages that say how to fix the problem.
 /// </summary>
-public interface IDownloadErrorExplainer
+public interface IYtDlpErrorExplainer
 {
     /// <summary>
     /// Explains an error.
