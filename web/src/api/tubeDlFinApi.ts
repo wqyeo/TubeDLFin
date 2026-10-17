@@ -1,5 +1,5 @@
 import type { HttpClient } from './httpClient';
-import type { TubeDLFinInfo } from './types';
+import type { ToolsOverview, TubeDLFinInfo } from './types';
 
 const routePrefix = 'TubeDLFin';
 
@@ -9,5 +9,14 @@ export class TubeDLFinApi {
 
     getInfo(): Promise<TubeDLFinInfo> {
         return this.http.getJson<TubeDLFinInfo>(`${routePrefix}/Info`);
+    }
+
+    getTools(): Promise<ToolsOverview> {
+        return this.http.getJson<ToolsOverview>(`${routePrefix}/Tools`);
+    }
+
+    /** Installs missing tools and updates outdated ones; resolves when done. */
+    updateTools(): Promise<ToolsOverview> {
+        return this.http.postJson<ToolsOverview>(`${routePrefix}/Tools/Update`);
     }
 }

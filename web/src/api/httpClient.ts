@@ -1,6 +1,7 @@
 /** Sends authenticated requests to the Jellyfin server. */
 export interface HttpClient {
     getJson<T>(path: string): Promise<T>;
+    postJson<T>(path: string, body?: unknown): Promise<T>;
 }
 
 /** The server answered with an error status. */
@@ -18,9 +19,26 @@ export class HttpError extends Error {
 export class JellyfinHttpClient implements HttpClient {
     constructor(private readonly apiClient: JellyfinApiClient) {}
 
-    async getJson<T>(path: string): Promise<T> {
+    getJson<T>(path: string): Promise<T> {
+        return this.send(() => this.apiClient.getJSON<T>(this.apiClient.getUrl(path)));
+    }
+
+    postJson<T>(path: string, body?: unknown): Promise<T> {
+        return this.send(() =>
+            this.apiClient.ajax<T>({
+                type: 'POST',
+                url: this.apiClient.getUrl(path),
+                dataType: 'json',
+                ...(body === undefined
+                    ? {}
+                    : { data: JSON.stringify(body), contentType: 'application/json' }),
+            }),
+        );
+    }
+
+    private async send<T>(request: () => Promise<T>): Promise<T> {
         try {
-            return await this.apiClient.getJSON<T>(this.apiClient.getUrl(path));
+            return await request();
         } catch (error) {
             throw toError(error);
         }

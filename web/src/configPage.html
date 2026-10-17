@@ -17,7 +17,45 @@
                 </div>
 
                 <div class="verticalSection">
-                    <h3 class="sectionTitle">Status</h3>
+                    <h3 class="sectionTitle">Tools</h3>
+                    <p class="fieldDescription">
+                        Platform: <span data-tubedlfin="tools-platform"></span>.
+                        TubeDLFin installs yt-dlp and Deno at server start and updates them daily
+                        (Dashboard → Scheduled Tasks → "Update yt-dlp and Deno").
+                    </p>
+                    <table class="tubedlfin-table">
+                        <thead>
+                            <tr><th>Tool</th><th>Status</th><th>Version</th><th>Path</th></tr>
+                        </thead>
+                        <tbody data-tubedlfin="tools-rows"></tbody>
+                    </table>
+                    <p class="tubedlfin-error" data-tubedlfin="tools-error" hidden></p>
+                    <button is="emby-button" type="button" class="raised button-submit emby-button"
+                        data-tubedlfin="tools-update">Update now</button>
+                    <div class="tubedlfin-last-update" data-tubedlfin="tools-last-update"></div>
+                </div>
+
+                <form class="verticalSection" data-tubedlfin="settings-form">
+                    <h3 class="sectionTitle">Settings</h3>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinYtDlpPath">Custom yt-dlp path</label>
+                        <input is="emby-input" type="text" id="TubeDLFinYtDlpPath" data-tubedlfin="settings-ytdlp-path" />
+                        <div class="fieldDescription">Leave blank to let TubeDLFin download and update yt-dlp itself.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinDenoPath">Custom Deno path</label>
+                        <input is="emby-input" type="text" id="TubeDLFinDenoPath" data-tubedlfin="settings-deno-path" />
+                        <div class="fieldDescription">
+                            Leave blank to let TubeDLFin manage Deno. Needed on systems without a prebuilt
+                            Deno, such as Alpine (musl).
+                        </div>
+                    </div>
+                    <p class="tubedlfin-error" data-tubedlfin="settings-error" hidden></p>
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button">Save</button>
+                </form>
+
+                <div class="verticalSection">
+                    <h3 class="sectionTitle">About</h3>
                     <dl class="tubedlfin-info" data-tubedlfin="info-list"></dl>
                     <p class="tubedlfin-error" data-tubedlfin="info-error" hidden></p>
                 </div>

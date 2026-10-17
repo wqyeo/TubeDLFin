@@ -1,8 +1,18 @@
+using System;
+using Jellyfin.Plugin.TubeDLFin.Configuration;
 using Jellyfin.Plugin.TubeDLFin.Platform;
+using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Status;
+using Jellyfin.Plugin.TubeDLFin.Tools;
+using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
+using Jellyfin.Plugin.TubeDLFin.Tools.Installation;
+using Jellyfin.Plugin.TubeDLFin.Tools.Releases;
+using Jellyfin.Plugin.TubeDLFin.Tools.Status;
+using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Jellyfin.Plugin.TubeDLFin;
 
@@ -16,8 +26,25 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
+        // Platform and settings
+        serviceCollection.TryAddSingleton(TimeProvider.System);
         serviceCollection.AddSingleton<IRuntimeEnvironment, RuntimeEnvironment>();
         serviceCollection.AddSingleton<IPluginPaths, PluginPaths>();
+        serviceCollection.AddSingleton<IPluginConfigurationProvider, PluginConfigurationProvider>();
+        serviceCollection.AddSingleton<IProcessRunner, ProcessRunner>();
         serviceCollection.AddSingleton<IPluginInfoProvider, PluginInfoProvider>();
+
+        // Tools: add a tool by registering another IToolDefinition.
+        serviceCollection.AddSingleton<IToolDefinition, YtDlpToolDefinition>();
+        serviceCollection.AddSingleton<IToolDefinition, DenoToolDefinition>();
+        serviceCollection.AddSingleton<IToolDefinitionRegistry, ToolDefinitionRegistry>();
+        serviceCollection.AddSingleton<IToolLocator, ToolLocator>();
+        serviceCollection.AddSingleton<IReleaseClient, GitHubReleaseClient>();
+        serviceCollection.AddSingleton<IToolVersionProbe>(services =>
+            new CachingToolVersionProbe(new ToolVersionProbe(services.GetRequiredService<IProcessRunner>())));
+        serviceCollection.AddSingleton<IToolInstaller, ToolInstaller>();
+        serviceCollection.AddSingleton<IToolUpdateService, ToolUpdateService>();
+        serviceCollection.AddSingleton<IFfmpegLocator, JellyfinFfmpegLocator>();
+        serviceCollection.AddSingleton<IToolStatusService, ToolStatusService>();
     }
 }

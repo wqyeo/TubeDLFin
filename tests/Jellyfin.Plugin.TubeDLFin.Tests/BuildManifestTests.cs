@@ -7,7 +7,7 @@ using Xunit;
 namespace Jellyfin.Plugin.TubeDLFin.Tests;
 
 /// <summary>
-/// build.yaml (read by JPRM) and Directory.Build.props duplicate facts from the code;
+/// build.yaml (read by JPRM), Directory.Build.props and web/src/plugin.ts duplicate facts from the code;
 /// these tests stop them from drifting apart.
 /// </summary>
 public class BuildManifestTests
@@ -33,6 +33,14 @@ public class BuildManifestTests
         var propsVersion = props.Root!.Element("PropertyGroup")!.Element("Version")!.Value;
 
         Assert.Equal(propsVersion, YamlValue("version"));
+    }
+
+    [Fact]
+    public void WebPluginId_MatchesPluginIdentity()
+    {
+        var pluginTs = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "plugin.ts.txt"));
+
+        Assert.Contains($"'{PluginIdentity.IdString}'", pluginTs, StringComparison.Ordinal);
     }
 
     [Fact]

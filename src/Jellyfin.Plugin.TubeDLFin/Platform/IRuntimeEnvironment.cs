@@ -24,6 +24,12 @@ public interface IRuntimeEnvironment
     bool IsLinux { get; }
 
     /// <summary>
+    /// Gets a value indicating whether the C library is musl (e.g. Alpine) rather than glibc.
+    /// Only meaningful on Linux; many prebuilt tools exist for glibc only.
+    /// </summary>
+    bool IsMusl { get; }
+
+    /// <summary>
     /// Gets a value indicating whether the operating system is Windows.
     /// </summary>
     bool IsWindows { get; }

@@ -22,8 +22,10 @@
 | Queue | `System.Threading.Channels` + N workers behind `DownloadManager.Enqueue(profile, url, source)` |
 | JSON | System.Text.Json with source-generated `JsonSerializerContext` for the yt-dlp `-J` models |
 | `.nfo` files | `System.Xml.Linq` |
-| Tool install | `RuntimeInformation.OSArchitecture` + musl detection, `IHttpClientFactory`, `ZipFile` (Deno), `File.SetUnixFileMode` |
-| Settings | `PluginConfiguration` (Jellyfin's XML config) |
+| Tool install | One `IToolDefinition` per tool (asset per platform, checksum file, version parsing); add a tool by registering another. Latest release read from the `github.com/<repo>/releases/latest` redirect (no REST API, so no 60/h limit). Download → SHA-256 check against the published list → unzip (Deno) → `chmod 755` → run `--version` on the new copy → atomic rename over the old one. A broken download never replaces a working tool |
+| Tool updates | Scheduled task "Update yt-dlp and Deno" (startup + daily 04:00, editable under Scheduled Tasks) and `POST /TubeDLFin/Tools/Update`; one run at a time, later callers join it. Tools with a custom path are never touched |
+| Platform | `ProcessArchitecture` + musl detection (`/lib/ld-musl-*`) → `linux-arm64-glibc` etc. Deno has no musl builds, so Alpine needs a custom Deno path |
+| Settings | `PluginConfiguration` (Jellyfin's XML config), read through `IPluginConfigurationProvider` (via `IPluginManager`, no static instance). M1: `YtDlpPath`, `DenoPath` (blank = managed) |
 | Saved data | Versioned JSON / text in `<server data>/tubedlfin` (`/config/data/tubedlfin` in Docker), via `IPluginPaths`. Not `BasePlugin.DataFolderPath`: that is inside `plugins/`, where Jellyfin treats every folder as a plugin |
 | Code quality | `Nullable` on, `TreatWarningsAsErrors`, `AnalysisMode=AllEnabledByDefault`, StyleCop / Serilog / multithreading analyzers as `GlobalPackageReference` (nothing ships). Package versions are pinned centrally in `Directory.Packages.props` |
 | Design | SOLID: classes depend on interfaces injected by DI (no `Plugin.Instance` statics); `PluginServiceRegistrator` is the composition root; pure logic is kept apart from processes, files and HTTP |

@@ -51,3 +51,8 @@ dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA0001.severity = none
 dotnet_diagnostic.CS1591.severity = none
 dotnet_diagnostic.CA2007.severity = none
+# Test helpers take URLs as strings and aren't called with nulls
+dotnet_diagnostic.CA1054.severity = none
+dotnet_diagnostic.CA1062.severity = none
+# Responses handed to HttpClient are disposed by it
+dotnet_diagnostic.CA2000.severity = none

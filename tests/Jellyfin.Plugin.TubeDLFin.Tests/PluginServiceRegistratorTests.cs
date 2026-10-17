@@ -1,8 +1,16 @@
-using Jellyfin.Plugin.TubeDLFin.Platform;
-using Jellyfin.Plugin.TubeDLFin.Status;
+using System;
+using System.Linq;
+using System.Net.Http;
+using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
+using Jellyfin.Plugin.TubeDLFin.Tools.Status;
+using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
 using MediaBrowser.Common.Configuration;
+using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller;
+using MediaBrowser.Controller.MediaEncoding;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Xunit;
 
@@ -19,12 +27,18 @@ public class PluginServiceRegistratorTests
         var serverHost = Substitute.For<IServerApplicationHost>();
         services.AddSingleton(serverHost);
         services.AddSingleton(Substitute.For<IApplicationPaths>());
+        services.AddSingleton(Substitute.For<IPluginManager>());
+        services.AddSingleton(Substitute.For<IMediaEncoder>());
+        services.AddSingleton(Substitute.For<IHttpClientFactory>());
+        services.AddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
 
         new PluginServiceRegistrator().RegisterServices(services, serverHost);
+        var ours = services.Where(d => d.ServiceType.Namespace?.StartsWith("Jellyfin.Plugin.TubeDLFin", StringComparison.Ordinal) == true).ToList();
 
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-        Assert.IsType<PluginInfoProvider>(provider.GetRequiredService<IPluginInfoProvider>());
-        Assert.IsType<PluginPaths>(provider.GetRequiredService<IPluginPaths>());
-        Assert.IsType<RuntimeEnvironment>(provider.GetRequiredService<IRuntimeEnvironment>());
+        Assert.All(ours, d => Assert.NotNull(provider.GetRequiredService(d.ServiceType)));
+        Assert.Equal(2, provider.GetRequiredService<IToolDefinitionRegistry>().All.Count);
+        Assert.IsType<CachingToolVersionProbe>(provider.GetRequiredService<IToolVersionProbe>());
+        Assert.NotNull(new UpdateToolsTask(provider.GetRequiredService<IToolUpdateService>()));
     }
 }

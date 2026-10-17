@@ -16,11 +16,17 @@ interface JellyfinApiClient {
     ajax<T = unknown>(request: JellyfinAjaxRequest): Promise<T>;
     /** GETs and parses JSON with the user's access token. Rejects with the Response on HTTP errors. */
     getJSON<T = unknown>(url: string): Promise<T>;
+    /** Reads a plugin's saved configuration object. */
+    getPluginConfiguration(pluginId: string): Promise<Record<string, unknown>>;
+    /** Replaces a plugin's saved configuration object. */
+    updatePluginConfiguration(pluginId: string, configuration: Record<string, unknown>): Promise<void>;
 }
 
 interface JellyfinDashboard {
     showLoadingMsg(): void;
     hideLoadingMsg(): void;
+    /** Hides the spinner and shows the standard "Settings saved" toast. */
+    processPluginConfigurationUpdateResult(): void;
 }
 
 declare var ApiClient: JellyfinApiClient;
