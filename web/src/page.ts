@@ -1,7 +1,7 @@
 import type { PageSection } from './sections/pageSection';
 import type { LoadingIndicator } from './views/loadingIndicator';
 
-/** The page: loads every section whenever it is shown. */
+/** The page: loads every section whenever it is shown, and tells them when it is left. */
 export class TubeDLFinPage {
     constructor(
         private readonly view: HTMLElement,
@@ -12,6 +12,11 @@ export class TubeDLFinPage {
     attach(): void {
         this.view.addEventListener('viewshow', () => {
             void this.refresh();
+        });
+        this.view.addEventListener('viewhide', () => {
+            for (const section of this.sections) {
+                section.hide?.();
+            }
         });
     }
 

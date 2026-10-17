@@ -74,3 +74,80 @@ export interface TubeDLFinSettings {
     YtDlpPath: string;
     DenoPath: string;
 }
+
+/** POST /TubeDLFin/Probe request body (C#: Api/ProbeRequest.cs). */
+export interface ProbeRequest {
+    Url: string;
+    NoPlaylist: boolean;
+}
+
+/** C#: Detection/ProbeKind.cs */
+export type ProbeKind = 'Video' | 'Playlist' | 'Channel';
+
+/** C#: Detection/MediaFormat.cs */
+export interface MediaFormat {
+    FormatId: string;
+    Extension: string;
+    Note?: string | null;
+    Width?: number | null;
+    Height?: number | null;
+    Fps?: number | null;
+    VideoCodec?: string | null;
+    AudioCodec?: string | null;
+    Bitrate?: number | null;
+    AudioBitrate?: number | null;
+    FileSize?: number | null;
+    IsFileSizeApproximate: boolean;
+    DynamicRange?: string | null;
+    Language?: string | null;
+    Protocol?: string | null;
+    HasVideo: boolean;
+    HasAudio: boolean;
+}
+
+/** C#: Detection/SubtitleTrack.cs */
+export interface SubtitleTrack {
+    Code: string;
+    Name?: string | null;
+}
+
+/** C#: Detection/PlaylistEntry.cs */
+export interface PlaylistEntry {
+    Index: number;
+    Id?: string | null;
+    Title: string;
+    Url?: string | null;
+    Duration?: number | null;
+    Uploader?: string | null;
+    IsCollection: boolean;
+    ItemCount?: number | null;
+    IsItemCountMinimum: boolean;
+}
+
+/** POST /TubeDLFin/Probe response (C#: Detection/ProbeResult.cs). */
+export interface ProbeResult {
+    Kind: ProbeKind;
+    Id: string;
+    Title: string;
+    Url?: string | null;
+    Site?: string | null;
+    Uploader?: string | null;
+    ChannelUrl?: string | null;
+    Thumbnail?: string | null;
+    Duration?: number | null;
+    /** ISO date, e.g. "2005-04-24". */
+    UploadDate?: string | null;
+    Artist?: string | null;
+    Album?: string | null;
+    Track?: string | null;
+    ReleaseYear?: number | null;
+    VideoFormats: MediaFormat[];
+    AudioFormats: MediaFormat[];
+    Subtitles: SubtitleTrack[];
+    AutomaticCaptions: SubtitleTrack[];
+    Entries: PlaylistEntry[];
+    ItemCount?: number | null;
+    IsTruncated: boolean;
+    HasPlaylistChoice: boolean;
+    Warnings: string[];
+}

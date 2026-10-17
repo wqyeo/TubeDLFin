@@ -14,8 +14,36 @@
                         <h2 class="sectionTitle">TubeDLFin</h2>
                     </div>
                     <p>Download videos and music with yt-dlp straight into your Jellyfin libraries.</p>
+                    <div class="tubedlfin-tabs" role="tablist">
+                        <button type="button" role="tab" class="tubedlfin-tab" data-tubedlfin-tab="download">Download</button>
+                        <button type="button" role="tab" class="tubedlfin-tab" data-tubedlfin-tab="settings">Tools &amp; settings</button>
+                    </div>
                 </div>
 
+                <div data-tubedlfin-panel="download" role="tabpanel">
+                <form class="verticalSection" data-tubedlfin="detect-form" novalidate>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinDetectUrl">Link</label>
+                        <input is="emby-input" type="url" id="TubeDLFinDetectUrl" data-tubedlfin="detect-url"
+                            placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" spellcheck="false" />
+                        <div class="fieldDescription">
+                            A video, playlist or channel from YouTube or any other site yt-dlp supports.
+                        </div>
+                    </div>
+                    <div class="tubedlfin-actions">
+                        <button is="emby-button" type="submit" class="raised button-submit emby-button"
+                            data-tubedlfin="detect-submit">Detect</button>
+                        <button is="emby-button" type="button" class="raised emby-button"
+                            data-tubedlfin="detect-cancel" hidden>Cancel</button>
+                        <span class="fieldDescription" data-tubedlfin="detect-status" aria-live="polite"></span>
+                    </div>
+                    <p class="tubedlfin-error" data-tubedlfin="detect-error" role="alert" hidden></p>
+                </form>
+
+                <div class="verticalSection tubedlfin-result" data-tubedlfin="detect-result" hidden></div>
+                </div>
+
+                <div data-tubedlfin-panel="settings" role="tabpanel" hidden>
                 <div class="verticalSection">
                     <h3 class="sectionTitle">Tools</h3>
                     <p class="fieldDescription">
@@ -58,6 +86,7 @@
                     <h3 class="sectionTitle">About</h3>
                     <dl class="tubedlfin-info" data-tubedlfin="info-list"></dl>
                     <p class="tubedlfin-error" data-tubedlfin="info-error" hidden></p>
+                </div>
                 </div>
             </div>
         </div>

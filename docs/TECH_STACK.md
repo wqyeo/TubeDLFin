@@ -10,6 +10,8 @@
 | Hosting | GitHub repo, Actions, Pages | **GitLab only** (`gitlab.com/wqyeo/jellyfin-plugin-tubedlfin`): CI, releases, manifest. No GitHub for now |
 | Prototype in `~/jellyfin-plugin-ytdlp` | Reuse or delete | **Ignored**: everything is written from scratch |
 | Dashboard page | Embedded HTML + JS | **TypeScript bundled with esbuild** into one embedded JS file |
+| Probe errors | 500 when tools can't be installed | **503** when yt-dlp isn't ready, **502** for unreadable output, **504** for timeouts; all as problem details (`detail` holds the message) |
+| Thumbnails | (not covered) | Loaded by the admin's browser straight from the site (`https` only, `no-referrer`). Jellyfin 12.2 sends no CSP header, so no proxy is needed |
 
 ## Backend (the plugin DLL)
 
@@ -20,10 +22,12 @@
 | Third-party runtime dependencies | **None.** Only the .NET base libraries plus what the Jellyfin host already loads (ASP.NET Core MVC, DI, logging, `IHttpClientFactory`, System.Text.Json). Extra DLLs risk version clashes with the server |
 | Running yt-dlp / Deno | `System.Diagnostics.Process` with `ArgumentList` (never a shell); cancel with `Kill(entireProcessTree: true)` |
 | Queue | `System.Threading.Channels` + N workers behind `DownloadManager.Enqueue(profile, url, source)` |
-| JSON | System.Text.Json with source-generated `JsonSerializerContext` for the yt-dlp `-J` models |
+| JSON | System.Text.Json. yt-dlp's `-J` output is read with `JsonDocument` and lenient helpers (sites leave out or null whatever they lack), not mapped to fixed classes |
 | `.nfo` files | `System.Xml.Linq` |
 | Tool install | One `IToolDefinition` per tool (asset per platform, checksum file, version parsing); add a tool by registering another. Latest release read from the `github.com/<repo>/releases/latest` redirect (no REST API, so no 60/h limit). Download → SHA-256 check against the published list → unzip (Deno) → `chmod 755` → run `--version` on the new copy → atomic rename over the old one. A broken download never replaces a working tool |
 | Tool updates | Scheduled task "Update yt-dlp and Deno" (startup + daily 04:00, editable under Scheduled Tasks) and `POST /TubeDLFin/Tools/Update`; one run at a time, later callers join it. Tools with a custom path are never touched |
+| Running yt-dlp | `IYtDlpCommandFactory` adds what every run needs: `--ignore-config --no-color --cache-dir`, `--js-runtimes deno:<path>` (only when Deno works), `--ffmpeg-location` (Jellyfin's), then the run's options and `-- <url>`. Links are checked first by `MediaUrl` (absolute http(s), ≤ 2048 chars, no spaces or user info) |
+| Detect | `yt-dlp --dump-single-json --flat-playlist --playlist-items 1:100 [--no-playlist]`, 2 min timeout, at most 2 at once (`ThrottledMediaProber` decorator). Aborting the HTTP request kills yt-dlp. "Video inside a playlist" links are recognised by `IPlaylistLinkInspector` implementations (YouTube for now). Parser tests use real yt-dlp output, cleaned by `tests/.../Detection/Samples/sanitize.mjs` (signed media URLs contain the server's IP) |
 | Platform | `ProcessArchitecture` + musl detection (`/lib/ld-musl-*`) → `linux-arm64-glibc` etc. Deno has no musl builds, so Alpine needs a custom Deno path |
 | Settings | `PluginConfiguration` (Jellyfin's XML config), read through `IPluginConfigurationProvider` (via `IPluginManager`, no static instance). M1: `YtDlpPath`, `DenoPath` (blank = managed) |
 | Saved data | Versioned JSON / text in `<server data>/tubedlfin` (`/config/data/tubedlfin` in Docker), via `IPluginPaths`. Not `BasePlugin.DataFolderPath`: that is inside `plugins/`, where Jellyfin treats every folder as a plugin |
@@ -44,9 +48,11 @@ web/                        # separate toolchain; output is embedded by src/.../
 ├── types/jellyfin.d.ts     # ambient types for the ApiClient and Dashboard globals
 └── src/
     ├── main.ts             # composition root: wires the classes below together
-    ├── page.ts             # TubeDLFinPage: loads data on "viewshow", hands it to views
-    ├── api/                # HttpClient interface + ApiClient adapter, TubeDLFinApi, DTO types
-    ├── views/              # one class per page section, plus the loading indicator
+    ├── page.ts             # TubeDLFinPage: loads sections on "viewshow", stops them on "viewhide"
+    ├── api/                # HttpClient (fetch + Jellyfin's auth header), TubeDLFinApi, DTO types
+    ├── sections/           # one controller per page section (Detect, Tools, Settings, About)
+    ├── state/              # DetectStore: the Detect step's state, observed by views (and M3's options)
+    ├── views/              # rendering only: forms, result card, tables, tabs, format helpers
     ├── dom.ts, styles.css  # helpers; CSS is bundled as text and injected
     └── configPage.html     # markup only, uses Jellyfin's own classes
 ```
@@ -61,7 +67,11 @@ web/                        # separate toolchain; output is embedded by src/.../
   `npm run build` (only when web sources change) before compiling. Skip it with
   `SkipWebBuild=true` when `web/dist` is already built.
 - **The dist output is not committed**: it's always built from source.
-- **No runtime JS libraries**: just the DOM and Jellyfin's `ApiClient` (which adds the token).
+- **No runtime JS libraries**: just the DOM and `fetch`. Requests carry the header from
+  `ApiClient.setRequestHeaders()`, so the page uses Jellyfin's own auth, and an `AbortSignal`
+  can cancel them (Cancel button, leaving the page).
+- **Untrusted text**: titles and names from sites only ever go in through `textContent`; links
+  must be http(s) and open with `rel="noopener noreferrer"`.
 - **Queue updates**: poll `GET /TubeDLFin/Downloads` every 1–2 s while the page is visible.
 - **API types**: written by hand in `web/src/api/types.ts` for v1 (Jellyfin's JSON is PascalCase).
 

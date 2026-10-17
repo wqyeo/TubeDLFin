@@ -1,5 +1,5 @@
 import type { HttpClient } from './httpClient';
-import type { ToolsOverview, TubeDLFinInfo } from './types';
+import type { ProbeRequest, ProbeResult, ToolsOverview, TubeDLFinInfo } from './types';
 
 const routePrefix = 'TubeDLFin';
 
@@ -18,5 +18,10 @@ export class TubeDLFinApi {
     /** Installs missing tools and updates outdated ones; resolves when done. */
     updateTools(): Promise<ToolsOverview> {
         return this.http.postJson<ToolsOverview>(`${routePrefix}/Tools/Update`);
+    }
+
+    /** Detects what a link points to. Aborting the signal stops yt-dlp on the server. */
+    probe(request: ProbeRequest, signal?: AbortSignal): Promise<ProbeResult> {
+        return this.http.postJson<ProbeResult>(`${routePrefix}/Probe`, request, signal ? { signal } : {});
     }
 }

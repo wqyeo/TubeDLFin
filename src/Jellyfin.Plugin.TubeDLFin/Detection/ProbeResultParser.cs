@@ -15,6 +15,9 @@ public sealed class ProbeResultParser : IProbeResultParser
     // yt-dlp writes "none" when a format has no video or no audio; a missing value means unknown.
     private const string None = "none";
 
+    // The page shows thumbnails 320 pixels wide.
+    private const int MinThumbnailWidth = 320;
+
     // Extractor names of list pages: YoutubeTab, SoundcloudSet, BandcampAlbum, ...
     private static readonly string[] _collectionExtractorSuffixes = ["Tab", "Playlist", "Channel", "Album", "Set", "User", "Series", "Season"];
 
@@ -186,9 +189,29 @@ public sealed class ProbeResultParser : IProbeResultParser
         return artists.Count > 0 ? string.Join(", ", artists) : info.String("artist");
     }
 
-    private static Uri? Thumbnail(JsonElement info) =>
-        HttpUrl(info.String("thumbnail"))
-        ?? info.Array("thumbnails").Select(t => HttpUrl(t.String("url"))).LastOrDefault(url => url is not null);
+    // Videos name their best thumbnail. Playlists and channels only list candidates, including
+    // banners and full-size originals of several megabytes: pick the smallest that still looks
+    // good on the page, and fall back to yt-dlp's preferred (last) one if sizes are unknown.
+    private static Uri? Thumbnail(JsonElement info)
+    {
+        var explicitThumbnail = HttpUrl(info.String("thumbnail"));
+        if (explicitThumbnail is not null)
+        {
+            return explicitThumbnail;
+        }
+
+        var candidates = info.Array("thumbnails")
+            .Select(t => (Url: HttpUrl(t.String("url")), Width: t.Integer("width"), Height: t.Integer("height")))
+            .Where(t => t.Url is not null)
+            .ToList();
+
+        var sized = candidates
+            .Where(t => t.Width >= MinThumbnailWidth && t.Height > 0 && t.Width <= t.Height * 2)
+            .OrderBy(t => t.Width)
+            .FirstOrDefault();
+
+        return sized.Url ?? candidates.LastOrDefault().Url;
+    }
 
     private static DateOnly? Date(string? yyyymmdd) =>
         DateOnly.TryParseExact(yyyymmdd, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date : null;

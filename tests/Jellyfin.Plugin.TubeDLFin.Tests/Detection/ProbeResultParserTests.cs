@@ -159,7 +159,7 @@ public class ProbeResultParserTests
         var result = _parser.Parse(Samples.Read("album"), Limit);
 
         Assert.Equal((ProbeKind.Playlist, "Daft Punk", 31), (result.Kind, result.Uploader, result.ItemCount!.Value));
-        Assert.EndsWith("/maxresdefault.jpg", result.Thumbnail?.AbsoluteUri, StringComparison.Ordinal);
+        Assert.Contains("/sddefault.jpg", result.Thumbnail?.AbsoluteUri, StringComparison.Ordinal); // 640x640, not the 1200 original
     }
 
     [Fact]
@@ -172,6 +172,30 @@ public class ProbeResultParserTests
         Assert.All(result.Entries, e => Assert.True(e.IsCollection));
         Assert.Equal(new Uri("https://www.youtube.com/@BlenderOfficial/videos"), result.Entries[0].Url);
         Assert.Equal((33, false), (result.Entries[2].ItemCount!.Value, result.Entries[2].IsItemCountMinimum));
+    }
+
+    [Fact]
+    public void Parse_ChannelRoot_PicksAvatarOverBannerAndOriginal()
+    {
+        var result = _parser.Parse(Samples.Read("channel"), Limit);
+
+        Assert.EndsWith("=s900-c-k-c0x00ffffff-no-rj", result.Thumbnail?.AbsoluteUri, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Parse_PlaylistThumbnail_SmallestAtLeast320Wide()
+    {
+        var result = _parser.Parse(Samples.Read("playlist"), Limit);
+
+        Assert.Contains("sqp=-oaymwExCNACELwB", result.Thumbnail?.AbsoluteUri, StringComparison.Ordinal); // 336x188
+    }
+
+    [Fact]
+    public void Parse_ThumbnailSizesUnknown_TakesLast()
+    {
+        const string Json = """{ "_type": "playlist", "id": "p", "thumbnails": [ { "url": "https://a.example/1.jpg" }, { "url": "https://a.example/2.jpg" } ] }""";
+
+        Assert.Equal(new Uri("https://a.example/2.jpg"), _parser.Parse(Json, Limit).Thumbnail);
     }
 
     [Fact]

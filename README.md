@@ -4,8 +4,8 @@
 the Jellyfin dashboard. Paste a video, playlist or channel URL, see what is available, pick the
 options, and TubeDLFin downloads it straight into one of your libraries.
 
-> **Status:** early development (M1, tools). yt-dlp and Deno are installed and kept up to
-> date; downloading media comes in M2–M3.
+> **Status:** early development (M2, detect). Links can be detected (formats, subtitles,
+> playlist and channel items); downloading media comes in M3.
 
 - Jellyfin **12.2** (`targetAbi 12.2.0.0`, `net10.0`)
 - Works for both **video** and **music** libraries
