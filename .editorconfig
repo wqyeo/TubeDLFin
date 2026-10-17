@@ -1,0 +1,53 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,toml,csproj,props,targets,slnx,xml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Style
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_var_for_built_in_types = true:silent
+csharp_style_var_when_type_is_apparent = true:silent
+csharp_prefer_braces = true:warning
+dotnet_sort_system_directives_first = true
+dotnet_style_readonly_field = true:warning
+
+# Private fields are _camelCase
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+dotnet_naming_style.underscore_camel.required_prefix = _
+
+# StyleCop rules that conflict with the conventions above
+# SA1101: prefix local calls with "this."
+dotnet_diagnostic.SA1101.severity = none
+# SA1309: field names must not begin with an underscore
+dotnet_diagnostic.SA1309.severity = none
+# SA1633: file must have a copyright header (the licence lives in LICENSE)
+dotnet_diagnostic.SA1633.severity = none
+# SA1200: using directives must be placed inside the namespace
+dotnet_diagnostic.SA1200.severity = none
+
+[tests/**.cs]
+# Test names use underscores: Method_State_Expectation
+dotnet_diagnostic.CA1707.severity = none
+# Tests are not a library: no XML docs or ConfigureAwait needed
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CA2007.severity = none

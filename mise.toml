@@ -1,0 +1,4 @@
+[tools]
+dotnet = "10.0.400"
+node = "24"
+uv = "latest"

@@ -1,0 +1,23 @@
+{
+  "name": "tubedlfin-web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TubeDLFin dashboard page (bundled into the plugin DLL)",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "check": "npm run typecheck && npm run lint"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,19 @@
+.tubedlfin-info {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.4em 1.5em;
+    margin: 0;
+}
+
+.tubedlfin-info dt {
+    opacity: 0.7;
+}
+
+.tubedlfin-info dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.tubedlfin-error {
+    color: #ff6b6b;
+}

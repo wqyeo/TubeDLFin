@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+*.user
+TestResults/
+artifacts/
+
+# IDEs
+.vs/
+.idea/
+.vscode/
+
+# Web
+web/node_modules/
+web/dist/
+
+# Local Jellyfin (dev/jellyfin.sh)
+dev/config/
+dev/cache/
+dev/media/

@@ -1,0 +1,17 @@
+---
+name: "TubeDLFin"
+guid: "0975c0da-6b11-4771-99fd-7d1176bf1f94"
+version: "0.1.0.0"
+targetAbi: "12.2.0.0"
+framework: "net10.0"
+overview: "Download videos and music with yt-dlp straight into your Jellyfin libraries"
+description: >
+  Paste a video, playlist or channel URL in the dashboard, pick the format,
+  quality, subtitles and destination library, and TubeDLFin downloads it with
+  yt-dlp and adds it to Jellyfin. Works for both video and music libraries.
+category: "General"
+owner: "wqyeo"
+artifacts:
+  - "Jellyfin.Plugin.TubeDLFin.dll"
+changelog: >
+  Project setup (M0).

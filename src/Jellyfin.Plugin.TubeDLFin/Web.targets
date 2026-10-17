@@ -1,0 +1,41 @@
+<Project>
+  <!--
+    Builds the dashboard page from ../../web (TypeScript + esbuild) and embeds its output.
+    Pass -p:SkipWebBuild=true (or set SkipWebBuild=true in the environment) when web/dist
+    was already built elsewhere, for example by the CI "web" job.
+  -->
+  <PropertyGroup>
+    <WebRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..', 'web'))</WebRoot>
+    <WebDist>$(WebRoot)dist/</WebDist>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <WebSource Include="$(WebRoot)src/**/*" />
+    <WebSource Include="$(WebRoot)package.json;$(WebRoot)package-lock.json;$(WebRoot)tsconfig.json;$(WebRoot)build.mjs" />
+
+    <!-- LogicalName must match the paths in Web/PluginWebPages.cs. -->
+    <EmbeddedResource Include="$(WebDist)configPage.html" LogicalName="$(RootNamespace).Web.configPage.html" />
+    <EmbeddedResource Include="$(WebDist)tubedlfin.js" LogicalName="$(RootNamespace).Web.tubedlfin.js" />
+  </ItemGroup>
+
+  <Target Name="TubeDLFinNpmInstall"
+          Condition="'$(SkipWebBuild)' != 'true'"
+          Inputs="$(WebRoot)package-lock.json"
+          Outputs="$(WebRoot)node_modules/.package-lock.json">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(WebRoot)" />
+  </Target>
+
+  <Target Name="TubeDLFinBuildWeb"
+          BeforeTargets="BeforeBuild"
+          DependsOnTargets="TubeDLFinNpmInstall"
+          Condition="'$(SkipWebBuild)' != 'true'"
+          Inputs="@(WebSource)"
+          Outputs="$(WebDist)tubedlfin.js;$(WebDist)configPage.html">
+    <Exec Command="npm run build" WorkingDirectory="$(WebRoot)" />
+  </Target>
+
+  <Target Name="TubeDLFinCheckWebDist" AfterTargets="TubeDLFinBuildWeb" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(WebDist)tubedlfin.js') Or !Exists('$(WebDist)configPage.html')"
+           Text="web/dist is missing. Run 'npm ci &amp;&amp; npm run build' in web/, or build without SkipWebBuild=true." />
+  </Target>
+</Project>

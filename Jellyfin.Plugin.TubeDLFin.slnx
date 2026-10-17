@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Jellyfin.Plugin.TubeDLFin/Jellyfin.Plugin.TubeDLFin.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Jellyfin.Plugin.TubeDLFin.Tests/Jellyfin.Plugin.TubeDLFin.Tests.csproj" />
+  </Folder>
+</Solution>

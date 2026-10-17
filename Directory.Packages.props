@@ -1,0 +1,17 @@
+<Project>
+  <ItemGroup Label="Jellyfin (must match targetAbi in build.yaml)">
+    <PackageVersion Include="Jellyfin.Controller" Version="12.2.0" />
+    <PackageVersion Include="Jellyfin.Model" Version="12.2.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="NSubstitute" Version="6.2.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="Analyzers (build-time only, never shipped)">
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+    <GlobalPackageReference Include="SerilogAnalyzer" Version="0.15.0" />
+    <GlobalPackageReference Include="SmartAnalyzers.MultithreadingAnalyzer" Version="1.1.31" />
+  </ItemGroup>
+</Project>
