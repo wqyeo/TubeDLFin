@@ -78,4 +78,9 @@ public sealed record DownloadProfile
     /// Gets what to do with sponsor segments.
     /// </summary>
     public SponsorBlockChoice SponsorBlock { get; init; } = new();
+
+    /// <summary>
+    /// Gets how music is tagged.
+    /// </summary>
+    public MusicTagging Music { get; init; } = new();
 }

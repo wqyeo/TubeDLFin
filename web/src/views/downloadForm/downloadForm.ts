@@ -13,6 +13,7 @@ import { element } from '../elements';
 import { codecName, formatBitrate, formatResolution, formatSize } from '../format';
 import type { DestinationFields } from './destinationFields';
 import type { ExtrasFields } from './extrasFields';
+import type { MusicFields } from './musicFields';
 import type { NamingFields } from './namingFields';
 import type { SponsorBlockFields } from './sponsorBlockFields';
 import type { SubtitleFields } from './subtitleFields';
@@ -49,6 +50,7 @@ export interface DownloadFormGroups {
     extras: ExtrasFields;
     subtitles: SubtitleFields;
     sponsorBlock: SponsorBlockFields;
+    music: MusicFields;
 }
 
 /**
@@ -56,6 +58,8 @@ export interface DownloadFormGroups {
  * values to start from (library defaults, remembered options) is the section's decision.
  */
 export class DownloadForm {
+    private isList = false;
+
     constructor(
         private readonly elements: DownloadFormElements,
         private readonly groups: DownloadFormGroups,
@@ -63,6 +67,7 @@ export class DownloadForm {
         elements.modeVideo.addEventListener('change', () => this.updateVisibility());
         elements.modeAudio.addEventListener('change', () => this.updateVisibility());
         elements.audioFormat.addEventListener('change', () => this.updateVisibility());
+        groups.destination.onLibrarySelected(() => this.updateVisibility());
     }
 
     onSubmit(handler: (values: DownloadFormValues) => void): void {
@@ -110,6 +115,7 @@ export class DownloadForm {
         );
 
         const isList = result.Kind !== 'Video';
+        this.isList = isList;
         elements.playlistOptions.hidden = !isList;
         elements.playlistItems.value = '';
         elements.playlistHint.hidden = !(
@@ -156,6 +162,10 @@ export class DownloadForm {
 
         this.groups.subtitles.write(values);
         this.groups.sponsorBlock.write(values);
+        if (values.music) {
+            this.groups.music.write(values.music);
+        }
+
         if (values.libraryFolder !== undefined || values.subfolder !== undefined) {
             this.groups.destination.write(values.libraryFolder, values.subfolder ?? '');
         }
@@ -195,8 +205,17 @@ export class DownloadForm {
             extras: this.groups.extras.read(),
             ...this.groups.subtitles.read(),
             ...this.groups.sponsorBlock.read(),
+            music: { ...this.groups.music.read(), Enabled: this.tagsAsMusic() },
             redownload: elements.redownload.checked,
         };
+    }
+
+    // Audio downloads and music videos get music tags (artist, title, album, track).
+    private tagsAsMusic(): boolean {
+        return (
+            this.elements.modeAudio.checked ||
+            this.groups.destination.selectedLibrary()?.Type === 'MusicVideos'
+        );
     }
 
     private updateVisibility(): void {
@@ -205,6 +224,7 @@ export class DownloadForm {
         this.elements.h264Option.hidden = audio;
         this.elements.audioOptions.hidden = !audio;
         this.elements.audioQuality.disabled = !hasBitrate(this.elements.audioFormat.value as AudioFormat);
+        this.groups.music.show(this.tagsAsMusic(), this.isList);
     }
 }
 

@@ -20,6 +20,7 @@ import { DetectResultView } from './views/detectResultView';
 import { DestinationFields } from './views/downloadForm/destinationFields';
 import { DownloadForm } from './views/downloadForm/downloadForm';
 import { ExtrasFields } from './views/downloadForm/extrasFields';
+import { MusicFields } from './views/downloadForm/musicFields';
 import { NamingFields } from './views/downloadForm/namingFields';
 import { SponsorBlockFields } from './views/downloadForm/sponsorBlockFields';
 import { SubtitleFields } from './views/downloadForm/subtitleFields';
@@ -114,6 +115,16 @@ export default class TubeDLFinController {
                         languages: find<HTMLInputElement>('download-subtitle-languages'),
                         includeAutomatic: find<HTMLInputElement>('download-subtitle-auto'),
                         embed: find<HTMLInputElement>('download-subtitle-embed'),
+                    }),
+                    music: new MusicFields({
+                        container: find('download-music-options'),
+                        split: find<HTMLInputElement>('download-music-split'),
+                        clean: find<HTMLInputElement>('download-music-clean'),
+                        numberOption: find('download-music-number-option'),
+                        number: find<HTMLInputElement>('download-music-number'),
+                        albumOption: find('download-music-album-option'),
+                        album: find<HTMLInputElement>('download-music-album'),
+                        square: find<HTMLInputElement>('download-music-square'),
                     }),
                     sponsorBlock: new SponsorBlockFields({
                         mode: find<HTMLSelectElement>('download-sponsorblock-mode'),

@@ -39,6 +39,14 @@ const values: DownloadFormValues = {
     embedSubtitles: false,
     sponsorBlockMode: 'Remove',
     sponsorBlockCategories: ['Sponsor'],
+    music: {
+        Enabled: true,
+        SplitArtistTitle: true,
+        CleanTitles: true,
+        NumberTracks: true,
+        PlaylistAsAlbum: false,
+        SquareCover: true,
+    },
     redownload: true,
 };
 

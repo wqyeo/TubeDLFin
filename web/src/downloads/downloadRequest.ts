@@ -3,6 +3,7 @@ import type {
     DownloadExtras,
     DownloadMode,
     DownloadRequest,
+    MusicTagging,
     NamingPresetId,
     ProbeRequest,
     ProbeResult,
@@ -38,6 +39,8 @@ export interface DownloadFormValues {
     embedSubtitles: boolean;
     sponsorBlockMode: SponsorBlockMode;
     sponsorBlockCategories: SponsorBlockCategory[];
+    /** Music tagging; the form sets Enabled for audio downloads and music video libraries. */
+    music: MusicTagging;
     redownload: boolean;
 }
 
@@ -90,6 +93,7 @@ export function buildDownloadRequest(
                 Mode: values.sponsorBlockCategories.length > 0 ? values.sponsorBlockMode : 'Off',
                 Categories: [...values.sponsorBlockCategories],
             },
+            Music: { ...values.music },
         },
     };
 }

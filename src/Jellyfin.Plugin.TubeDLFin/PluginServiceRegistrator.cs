@@ -97,6 +97,8 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IDownloadOptionSet, ExtrasOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, SubtitleOptions>();
         serviceCollection.AddSingleton<IDownloadOptionSet, SponsorBlockOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, MusicMetadataOptions>();
+        serviceCollection.AddSingleton<IDownloadOptionSet, SquareCoverOptions>();
         serviceCollection.AddSingleton<IDownloadArgumentsBuilder, DownloadArgumentsBuilder>();
         serviceCollection.AddSingleton<IYtDlpOutputParser, YtDlpOutputParser>();
         serviceCollection.AddSingleton<DownloadManager>();

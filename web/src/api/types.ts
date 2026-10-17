@@ -238,6 +238,16 @@ export interface SponsorBlockChoice {
     Categories: SponsorBlockCategory[];
 }
 
+/** C#: Downloads/MusicTagging.cs */
+export interface MusicTagging {
+    Enabled: boolean;
+    SplitArtistTitle: boolean;
+    CleanTitles: boolean;
+    NumberTracks: boolean;
+    PlaylistAsAlbum: boolean;
+    SquareCover: boolean;
+}
+
 /** C#: Downloads/DownloadProfile.cs */
 export interface DownloadProfile {
     Mode: DownloadMode;
@@ -254,6 +264,7 @@ export interface DownloadProfile {
     Extras: DownloadExtras;
     Subtitles: SubtitleChoice;
     SponsorBlock: SponsorBlockChoice;
+    Music: MusicTagging;
 }
 
 /** POST /TubeDLFin/Downloads request body (C#: Downloads/DownloadRequest.cs). */

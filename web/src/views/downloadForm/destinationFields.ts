@@ -24,6 +24,7 @@ export class DestinationFields {
     private libraries: LibraryInfo[] = [];
     private estimate: number | undefined;
     private libraryChanged: (library: LibraryInfo) => void = () => {};
+    private librarySelected: () => void = () => {};
 
     constructor(private readonly elements: DestinationElements) {
         elements.library.addEventListener('change', () => {
@@ -34,6 +35,11 @@ export class DestinationFields {
             }
         });
         elements.folder.addEventListener('change', () => this.showFreeSpace());
+    }
+
+    /** Called whenever the selected library changes, by the admin or the code. */
+    onLibrarySelected(handler: () => void): void {
+        this.librarySelected = handler;
     }
 
     /** Called when the admin picks another library (not when the code sets one). */
@@ -97,6 +103,7 @@ export class DestinationFields {
     }
 
     private fillFolders(): void {
+        this.librarySelected();
         const folders = this.selectedLibrary()?.Folders ?? [];
         this.elements.folder.replaceChildren(...folders.map((folder) => option(folder.Path, folder.Path)));
         this.elements.folderContainer.hidden = folders.length < 2;

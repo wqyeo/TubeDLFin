@@ -43,6 +43,14 @@ const values: DownloadFormValues = {
     embedSubtitles: false,
     sponsorBlockMode: 'Remove',
     sponsorBlockCategories: ['Sponsor'],
+    music: {
+        Enabled: true,
+        SplitArtistTitle: true,
+        CleanTitles: true,
+        NumberTracks: true,
+        PlaylistAsAlbum: false,
+        SquareCover: true,
+    },
     redownload: false,
 };
 
@@ -71,6 +79,7 @@ describe('buildDownloadRequest', () => {
             Extras: values.extras,
             Subtitles: { Languages: 'en,de', IncludeAutomatic: true, Embed: false },
             SponsorBlock: { Mode: 'Remove', Categories: ['Sponsor'] },
+            Music: values.music,
         });
     });
 

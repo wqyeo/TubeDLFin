@@ -4,8 +4,9 @@
 the Jellyfin dashboard. Paste a video, playlist or channel URL, see what is available, pick the
 options, and TubeDLFin downloads it straight into one of your libraries.
 
-> **Status:** early development (M4, polish). Links are detected and downloaded into a library
-> with the right layout, `.nfo` metadata, posters and subtitles. Music tagging comes in M4.5.
+> **Status:** early development (M4.5, music). Links are detected and downloaded into video and
+> music libraries with the right layout, metadata, posters, subtitles and music tags. The public
+> release (plugin repository, install guide) comes in M5.
 
 - Jellyfin **12.2** (`targetAbi 12.2.0.0`, `net10.0`)
 - Works for both **video** and **music** libraries

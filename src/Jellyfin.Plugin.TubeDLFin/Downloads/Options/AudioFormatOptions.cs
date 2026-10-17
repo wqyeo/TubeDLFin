@@ -22,7 +22,9 @@ public sealed class AudioFormatOptions : IDownloadOptionSet
         }
 
         arguments.Add("--format");
-        arguments.Add(plan.FormatId ?? "ba/b");
+
+        // For M4A, YouTube's AAC stream fits as it is: prefer it, so nothing is re-encoded.
+        arguments.Add(plan.FormatId ?? (profile.AudioFormat == AudioFormat.M4a ? "ba[ext=m4a]/ba/b" : "ba/b"));
         arguments.Add("--extract-audio");
 
         if (profile.AudioFormat != AudioFormat.Original)

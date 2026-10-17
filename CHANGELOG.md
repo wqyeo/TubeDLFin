@@ -6,6 +6,13 @@ All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.P
 ## [Unreleased]
 
 ### Added
+- Music (M4.5): audio downloads and music videos get proper tags. "Artist - Title" titles are
+  split when the site names no artist, "(Official Video)", "(Lyrics)" and similar are removed,
+  YouTube's " - Topic" is dropped from artists, playlists number their tracks, YouTube Music
+  albums keep their album and release year, and a playlist can become one album by
+  "Various Artists". Embedded cover art is cropped to a square.
+- Music defaults to M4A taken from YouTube's AAC stream as it is (no re-encoding); files go in
+  `Album artist/Album/01 - Title.m4a`, tracks without an album in `Artist/Singles/`.
 - Polish (M4): file naming presets chosen by library type: one folder per video for movies,
   "Channel / Season year / SYYYYEMMDDHHMM" for shows (episode numbers from the upload date and
   time, so same-day uploads don't merge), "Artist / Title" for music videos, "Artist / Album /

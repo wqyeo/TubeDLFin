@@ -112,7 +112,7 @@ public class DownloadOptionSetTests
     [InlineData(AudioFormat.Opus, null, new[] { "--format", "ba/b", "--extract-audio", "--audio-format", "opus" })]
     [InlineData(AudioFormat.Flac, 320, new[] { "--format", "ba/b", "--extract-audio", "--audio-format", "flac" })]
     [InlineData(AudioFormat.Wav, null, new[] { "--format", "ba/b", "--extract-audio", "--audio-format", "wav" })]
-    [InlineData(AudioFormat.M4a, 128, new[] { "--format", "ba/b", "--extract-audio", "--audio-format", "m4a", "--audio-quality", "128K" })]
+    [InlineData(AudioFormat.M4a, 128, new[] { "--format", "ba[ext=m4a]/ba/b", "--extract-audio", "--audio-format", "m4a", "--audio-quality", "128K" })]
     public void Audio_Conversion(AudioFormat format, int? quality, string[] expected)
     {
         var plan = DownloadPlans.Create(new DownloadProfile { Mode = DownloadMode.Audio, AudioFormat = format, AudioQuality = quality });

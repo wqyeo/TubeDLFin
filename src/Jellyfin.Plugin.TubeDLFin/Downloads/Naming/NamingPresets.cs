@@ -66,15 +66,16 @@ public static class NamingPresets
         [LibraryType.MusicVideos]);
 
     /// <summary>
-    /// <c>Artist/Album/Title.ext</c>, the default for music libraries. Jellyfin reads music from
-    /// the files' tags; the folders just keep things tidy.
+    /// <c>Album artist/Album/01 - Title.ext</c>, the default for music libraries; tracks without
+    /// an album go in <c>Singles</c>. Jellyfin reads music from the files' tags (see
+    /// <see cref="Options.MusicMetadataOptions"/>); the folders just keep things tidy.
     /// </summary>
     public static readonly NamingPreset Music = new(
         NamingPresetId.Music,
-        "Artist / Album / Title",
-        "Daft Punk/Homework/Da Funk.m4a",
-        $"{Parts.Artist}/%(album,playlist_title|Singles)s/%(track,title)s.%(ext)s",
-        $"{Parts.Artist}/%(album,playlist_title|Singles)s/%(track,title)s-poster.%(ext)s",
+        "Artist / Album / 01 - Title",
+        "Daft Punk/Homework/01 - Daftendirekt.m4a",
+        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}%(track,title)s.%(ext)s",
+        $"{Parts.AlbumArtist}/{Parts.Album}/{Parts.TrackPrefix}%(track,title)s-poster.%(ext)s",
         [LibraryType.Music]);
 
     // Template pieces shared by the presets.
@@ -83,6 +84,11 @@ public static class NamingPresets
         public const string Channel = "%(uploader,channel,creator|Unknown)s";
         public const string Artist = "%(artist,creator,uploader|Unknown)s";
         public const string TitleAndId = "%(title)s [%(id)s]";
+        public const string AlbumArtist = "%(album_artist,artist,creator,uploader|Unknown)s";
+        public const string Album = "%(album|Singles)s";
+
+        // "01 - " when the track has a number (music tagging pads it to two digits).
+        public const string TrackPrefix = "%(track_number&{} - |)s";
 
         // Season and episode: S2026E10131445 (year, then month, day, hour, minute of the upload).
         public const string EpisodeTag = "S%(upload_date>%Y|0)sE%(upload_date>%m%d|0000)s%(timestamp>%H%M|0000)s";

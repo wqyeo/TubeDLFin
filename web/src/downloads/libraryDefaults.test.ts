@@ -18,6 +18,10 @@ describe('libraryDefaults', () => {
         assert.equal(categoryOf(library('Music', 'Music')), 'music');
         assert.equal(defaults.mode, 'Audio');
         assert.equal(defaults.naming, 'Music');
+        assert.equal(defaults.audioFormat, 'M4a');
+        assert.equal(defaults.music.SplitArtistTitle, true);
+        assert.equal(defaults.music.PlaylistAsAlbum, false);
+        assert.equal(defaults.music.SquareCover, true);
         assert.deepEqual(defaults.extras, {
             WriteNfo: false,
             SaveThumbnail: false,
@@ -35,6 +39,7 @@ describe('libraryDefaults', () => {
         assert.equal(defaults.naming, 'TvShow');
         assert.equal(defaults.extras.WriteNfo, true);
         assert.equal(defaults.extras.SaveThumbnail, true);
+        assert.equal(defaults.audioFormat, undefined, 'video libraries leave the audio format alone');
     });
 
     it('returns fresh objects', () => {
