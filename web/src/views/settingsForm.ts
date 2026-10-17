@@ -6,6 +6,8 @@ export interface SettingsFormElements {
     ytDlpPath: HTMLInputElement;
     denoPath: HTMLInputElement;
     maxConcurrentDownloads: HTMLInputElement;
+    cookiesFile: HTMLInputElement;
+    extraArguments: HTMLInputElement;
     error: HTMLElement;
 }
 
@@ -24,6 +26,8 @@ export class SettingsForm {
                     1,
                     5,
                 ),
+                CookiesFile: this.elements.cookiesFile.value.trim(),
+                ExtraArguments: this.elements.extraArguments.value.trim(),
             });
         });
     }
@@ -32,6 +36,8 @@ export class SettingsForm {
         this.elements.ytDlpPath.value = settings.YtDlpPath;
         this.elements.denoPath.value = settings.DenoPath;
         this.elements.maxConcurrentDownloads.value = String(settings.MaxConcurrentDownloads);
+        this.elements.cookiesFile.value = settings.CookiesFile;
+        this.elements.extraArguments.value = settings.ExtraArguments;
         this.elements.error.hidden = true;
     }
 

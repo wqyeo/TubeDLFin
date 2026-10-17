@@ -4,6 +4,7 @@ import type {
     DownloadJobInfo,
     DownloadRequest,
     LibraryInfo,
+    NamingPreset,
     ProbeRequest,
     ProbeResult,
     ToolsOverview,
@@ -36,6 +37,10 @@ export class TubeDLFinApi {
 
     getLibraries(): Promise<LibraryInfo[]> {
         return this.http.getJson<LibraryInfo[]>(`${routePrefix}/Libraries`);
+    }
+
+    getNamingPresets(): Promise<NamingPreset[]> {
+        return this.http.getJson<NamingPreset[]>(`${routePrefix}/NamingPresets`);
     }
 
     getDownloads(): Promise<DownloadJobInfo[]> {

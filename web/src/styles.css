@@ -361,3 +361,35 @@
     white-space: pre-wrap;
     word-break: break-all;
 }
+
+.tubedlfin-checks {
+    display: grid;
+    gap: 0.5em;
+    margin: 0.5em 0 1em;
+}
+
+.tubedlfin-checks label {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 0.6em;
+}
+
+.tubedlfin-details h4 {
+    margin: 1em 0 0.3em;
+}
+
+.tubedlfin-chip-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 1em;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: 0.2em 0.75em;
+}
+
+.tubedlfin-chip-button[aria-pressed="true"] {
+    background: #00a4dc;
+    color: #fff;
+}

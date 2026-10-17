@@ -1,9 +1,13 @@
 import type {
     AudioFormat,
+    DownloadExtras,
     DownloadMode,
     DownloadRequest,
+    NamingPresetId,
     ProbeRequest,
     ProbeResult,
+    SponsorBlockCategory,
+    SponsorBlockMode,
     VideoContainer,
 } from '../api/types';
 
@@ -26,6 +30,14 @@ export interface DownloadFormValues {
     libraryId: string;
     libraryFolder: string;
     subfolder: string;
+    naming: NamingPresetId;
+    customTemplate: string;
+    extras: DownloadExtras;
+    subtitleLanguages: string;
+    includeAutomaticSubtitles: boolean;
+    embedSubtitles: boolean;
+    sponsorBlockMode: SponsorBlockMode;
+    sponsorBlockCategories: SponsorBlockCategory[];
     redownload: boolean;
 }
 
@@ -46,6 +58,8 @@ export function buildDownloadRequest(
     const bitrate = Number.parseInt(values.audioQuality, 10);
     const items = values.playlistItems.trim();
     const subfolder = values.subfolder.trim();
+    const languages = values.subtitleLanguages.replace(/\s+/g, '');
+    const custom = values.naming === 'Custom' ? values.customTemplate.trim() : '';
 
     return {
         Url: probe.Url,
@@ -64,6 +78,18 @@ export function buildDownloadRequest(
             LibraryId: values.libraryId,
             LibraryFolder: values.libraryFolder,
             Subfolder: subfolder || null,
+            Naming: values.naming,
+            CustomTemplate: custom || null,
+            Extras: { ...values.extras },
+            Subtitles: {
+                Languages: languages || null,
+                IncludeAutomatic: values.includeAutomaticSubtitles,
+                Embed: values.embedSubtitles,
+            },
+            SponsorBlock: {
+                Mode: values.sponsorBlockCategories.length > 0 ? values.sponsorBlockMode : 'Off',
+                Categories: [...values.sponsorBlockCategories],
+            },
         },
     };
 }

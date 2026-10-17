@@ -19,6 +19,8 @@ export class JellyfinSettingsStore implements SettingsStore {
             YtDlpPath: stringOrEmpty(configuration.YtDlpPath),
             DenoPath: stringOrEmpty(configuration.DenoPath),
             MaxConcurrentDownloads: positiveIntegerOr(configuration.MaxConcurrentDownloads, 1),
+            CookiesFile: stringOrEmpty(configuration.CookiesFile),
+            ExtraArguments: stringOrEmpty(configuration.ExtraArguments),
         };
     }
 

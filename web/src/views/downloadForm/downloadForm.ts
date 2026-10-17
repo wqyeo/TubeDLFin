@@ -1,18 +1,25 @@
 import type {
     AudioFormat,
-    DownloadMode,
     LibraryInfo,
     MediaFormat,
+    NamingPreset,
     ProbeResult,
     VideoContainer,
-} from '../api/types';
-import { type DownloadFormValues, formatValuePrefix, hasBitrate } from '../downloads/downloadRequest';
-import { element } from './elements';
-import { codecName, formatBitrate, formatResolution, formatSize } from './format';
+} from '../../api/types';
+import { type DownloadFormValues, formatValuePrefix, hasBitrate } from '../../downloads/downloadRequest';
+import { estimateSize } from '../../downloads/freeSpace';
+import type { RememberedOptions } from '../../downloads/optionsMemory';
+import { element } from '../elements';
+import { codecName, formatBitrate, formatResolution, formatSize } from '../format';
+import type { DestinationFields } from './destinationFields';
+import type { ExtrasFields } from './extrasFields';
+import type { NamingFields } from './namingFields';
+import type { SponsorBlockFields } from './sponsorBlockFields';
+import type { SubtitleFields } from './subtitleFields';
 
 const heights = [2160, 1440, 1080, 720, 480, 360];
 
-/** Elements of the download options form. */
+/** Elements of the download form itself (the field groups have their own). */
 export interface DownloadFormElements {
     form: HTMLFormElement;
     modeVideo: HTMLInputElement;
@@ -29,25 +36,33 @@ export interface DownloadFormElements {
     playlistOptions: HTMLElement;
     playlistItems: HTMLInputElement;
     playlistHint: HTMLElement;
-    library: HTMLSelectElement;
-    folderContainer: HTMLElement;
-    folder: HTMLSelectElement;
-    subfolder: HTMLInputElement;
     redownload: HTMLInputElement;
     submit: HTMLButtonElement;
     status: HTMLElement;
     error: HTMLElement;
 }
 
-/** The options form shown under a detected link: what to keep, quality and destination. */
-export class DownloadForm {
-    private libraries: LibraryInfo[] = [];
+/** The field groups the form is made of. */
+export interface DownloadFormGroups {
+    destination: DestinationFields;
+    naming: NamingFields;
+    extras: ExtrasFields;
+    subtitles: SubtitleFields;
+    sponsorBlock: SponsorBlockFields;
+}
 
-    constructor(private readonly elements: DownloadFormElements) {
+/**
+ * The options form under a detected link. A view only: it shows and reads values. Which
+ * values to start from (library defaults, remembered options) is the section's decision.
+ */
+export class DownloadForm {
+    constructor(
+        private readonly elements: DownloadFormElements,
+        private readonly groups: DownloadFormGroups,
+    ) {
         elements.modeVideo.addEventListener('change', () => this.updateVisibility());
         elements.modeAudio.addEventListener('change', () => this.updateVisibility());
         elements.audioFormat.addEventListener('change', () => this.updateVisibility());
-        elements.library.addEventListener('change', () => this.fillFolders());
     }
 
     onSubmit(handler: (values: DownloadFormValues) => void): void {
@@ -57,25 +72,31 @@ export class DownloadForm {
         });
     }
 
-    setLibraries(libraries: LibraryInfo[]): void {
-        const selected = this.elements.library.value;
-        this.libraries = libraries;
-        this.elements.library.replaceChildren(
-            ...libraries.map((library) =>
-                option(library.Id, `${library.Name} (${libraryTypeLabel(library)})`),
-            ),
-        );
-        if (libraries.some((library) => library.Id === selected)) {
-            this.elements.library.value = selected;
-        }
+    onLibraryChanged(handler: (library: LibraryInfo) => void): void {
+        this.groups.destination.onLibraryChanged(handler);
+    }
 
-        this.fillFolders();
-        this.elements.submit.disabled = libraries.length === 0;
+    setLibraries(libraries: LibraryInfo[]): void {
+        this.groups.destination.setLibraries(libraries);
+        this.setBusy(false);
         if (libraries.length === 0) {
             this.showError('There are no video or music libraries yet. Add one under Dashboard → Libraries.');
         }
     }
 
+    setNamingPresets(presets: NamingPreset[]): void {
+        this.groups.naming.setPresets(presets);
+    }
+
+    selectLibrary(id: string | undefined): LibraryInfo | undefined {
+        return this.groups.destination.selectLibrary(id);
+    }
+
+    selectedLibrary(): LibraryInfo | undefined {
+        return this.groups.destination.selectedLibrary();
+    }
+
+    /** Fills in what depends on the detected link and shows the form. */
     show(result: ProbeResult): void {
         const elements = this.elements;
         elements.videoQuality.replaceChildren(
@@ -88,17 +109,18 @@ export class DownloadForm {
             ...formatGroup('Audio formats of this video', result.AudioFormats, audioFormatLabel),
         );
 
-        // Sites without video (SoundCloud, ...) start in audio mode.
-        const audioOnly = result.VideoFormats.length === 0 && result.AudioFormats.length > 0;
-        elements.modeAudio.checked = audioOnly;
-        elements.modeVideo.checked = !audioOnly;
-
         const isList = result.Kind !== 'Video';
         elements.playlistOptions.hidden = !isList;
         elements.playlistItems.value = '';
-        const onlyTabs =
-            isList && result.Entries.length > 0 && result.Entries.every((entry) => entry.IsCollection);
-        elements.playlistHint.hidden = !onlyTabs;
+        elements.playlistHint.hidden = !(
+            isList &&
+            result.Entries.length > 0 &&
+            result.Entries.every((entry) => entry.IsCollection)
+        );
+        elements.redownload.checked = false;
+
+        this.groups.subtitles.showTracks(result.Subtitles, result.AutomaticCaptions);
+        this.groups.destination.setEstimate(estimateSize(result));
 
         elements.status.textContent = '';
         elements.error.hidden = true;
@@ -110,8 +132,39 @@ export class DownloadForm {
         this.elements.form.hidden = true;
     }
 
+    /** Sets the given values; anything left out keeps its current value. */
+    apply(values: Partial<RememberedOptions>): void {
+        const elements = this.elements;
+        if (values.mode) {
+            elements.modeAudio.checked = values.mode === 'Audio';
+            elements.modeVideo.checked = values.mode !== 'Audio';
+        }
+
+        setSelect(elements.videoQuality, values.videoQuality);
+        setSelect(elements.container, values.container);
+        setSelect(elements.audioStream, values.audioStream);
+        setSelect(elements.audioFormat, values.audioFormat);
+        setSelect(elements.audioQuality, values.audioQuality);
+        if (values.preferH264 !== undefined) {
+            elements.preferH264.checked = values.preferH264;
+        }
+
+        this.groups.naming.write(values);
+        if (values.extras) {
+            this.groups.extras.write(values.extras);
+        }
+
+        this.groups.subtitles.write(values);
+        this.groups.sponsorBlock.write(values);
+        if (values.libraryFolder !== undefined || values.subfolder !== undefined) {
+            this.groups.destination.write(values.libraryFolder, values.subfolder ?? '');
+        }
+
+        this.updateVisibility();
+    }
+
     setBusy(busy: boolean): void {
-        this.elements.submit.disabled = busy || this.libraries.length === 0;
+        this.elements.submit.disabled = busy || !this.groups.destination.hasLibraries;
         this.elements.submit.textContent = busy ? 'Adding…' : 'Download';
     }
 
@@ -126,10 +179,10 @@ export class DownloadForm {
         this.elements.error.hidden = false;
     }
 
-    private values(): DownloadFormValues {
+    values(): DownloadFormValues {
         const elements = this.elements;
         return {
-            mode: (elements.modeAudio.checked ? 'Audio' : 'Video') satisfies DownloadMode,
+            mode: elements.modeAudio.checked ? 'Audio' : 'Video',
             videoQuality: elements.videoQuality.value,
             container: elements.container.value as VideoContainer,
             preferH264: elements.preferH264.checked,
@@ -137,9 +190,11 @@ export class DownloadForm {
             audioFormat: elements.audioFormat.value as AudioFormat,
             audioQuality: elements.audioQuality.value,
             playlistItems: elements.playlistItems.value,
-            libraryId: elements.library.value,
-            libraryFolder: elements.folder.value,
-            subfolder: elements.subfolder.value,
+            ...this.groups.destination.read(),
+            ...this.groups.naming.read(),
+            extras: this.groups.extras.read(),
+            ...this.groups.subtitles.read(),
+            ...this.groups.sponsorBlock.read(),
             redownload: elements.redownload.checked,
         };
     }
@@ -151,12 +206,12 @@ export class DownloadForm {
         this.elements.audioOptions.hidden = !audio;
         this.elements.audioQuality.disabled = !hasBitrate(this.elements.audioFormat.value as AudioFormat);
     }
+}
 
-    private fillFolders(): void {
-        const library = this.libraries.find((candidate) => candidate.Id === this.elements.library.value);
-        const folders = library?.Folders ?? [];
-        this.elements.folder.replaceChildren(...folders.map((folder) => option(folder, folder)));
-        this.elements.folderContainer.hidden = folders.length < 2;
+// Only values the list offers are set, so a remembered value that no longer exists is ignored.
+function setSelect(select: HTMLSelectElement, value: string | undefined): void {
+    if (value !== undefined && [...select.options].some((o) => o.value === value)) {
+        select.value = value;
     }
 }
 
@@ -205,17 +260,4 @@ function audioFormatLabel(format: MediaFormat): string {
     ]
         .filter(Boolean)
         .join(' · ');
-}
-
-function libraryTypeLabel(library: LibraryInfo): string {
-    switch (library.Type) {
-        case 'Shows':
-            return 'shows';
-        case 'MusicVideos':
-            return 'music videos';
-        case 'HomeVideos':
-            return 'home videos';
-        default:
-            return library.Type.toLowerCase();
-    }
 }

@@ -74,6 +74,8 @@ export interface TubeDLFinSettings {
     YtDlpPath: string;
     DenoPath: string;
     MaxConcurrentDownloads: number;
+    CookiesFile: string;
+    ExtraArguments: string;
 }
 
 /** POST /TubeDLFin/Probe request body (C#: Api/ProbeRequest.cs). */
@@ -156,12 +158,39 @@ export interface ProbeResult {
 /** C#: Libraries/LibraryType.cs */
 export type LibraryType = 'Movies' | 'Shows' | 'Music' | 'MusicVideos' | 'HomeVideos' | 'Mixed';
 
-/** GET /TubeDLFin/Libraries (C#: Libraries/LibraryInfo.cs). */
+/** C#: Downloads/Naming/NamingPresetId.cs */
+export type NamingPresetId =
+    | 'ChannelTitle'
+    | 'MovieFolder'
+    | 'TvShow'
+    | 'Playlist'
+    | 'MusicVideo'
+    | 'Music'
+    | 'Custom';
+
+/** GET /TubeDLFin/NamingPresets (C#: Downloads/Naming/NamingPreset.cs). */
+export interface NamingPreset {
+    Id: NamingPresetId;
+    Name: string;
+    Example: string;
+    MediaTemplate: string;
+    ThumbnailTemplate: string;
+    DefaultFor: LibraryType[];
+}
+
+/** C#: Api/LibraryFolderView.cs */
+export interface LibraryFolder {
+    Path: string;
+    FreeBytes?: number | null;
+}
+
+/** GET /TubeDLFin/Libraries (C#: Api/LibraryView.cs). */
 export interface LibraryInfo {
     Id: string;
     Name: string;
     Type: LibraryType;
-    Folders: string[];
+    DefaultNaming: NamingPresetId;
+    Folders: LibraryFolder[];
 }
 
 /** C#: Downloads/DownloadMode.cs */
@@ -172,6 +201,42 @@ export type VideoContainer = 'Auto' | 'Mp4' | 'Mkv' | 'Webm';
 
 /** C#: Downloads/AudioFormat.cs */
 export type AudioFormat = 'Original' | 'M4a' | 'Mp3' | 'Opus' | 'Flac' | 'Wav';
+
+/** C#: Downloads/DownloadExtras.cs */
+export interface DownloadExtras {
+    WriteNfo: boolean;
+    SaveThumbnail: boolean;
+    EmbedThumbnail: boolean;
+    EmbedMetadata: boolean;
+    EmbedChapters: boolean;
+}
+
+/** C#: Downloads/SubtitleChoice.cs */
+export interface SubtitleChoice {
+    Languages: string | null;
+    IncludeAutomatic: boolean;
+    Embed: boolean;
+}
+
+/** C#: Downloads/SponsorBlockMode.cs */
+export type SponsorBlockMode = 'Off' | 'Remove' | 'Mark';
+
+/** C#: Downloads/SponsorBlockCategory.cs */
+export type SponsorBlockCategory =
+    | 'Sponsor'
+    | 'SelfPromo'
+    | 'Interaction'
+    | 'Intro'
+    | 'Outro'
+    | 'Preview'
+    | 'Filler'
+    | 'MusicOffTopic';
+
+/** C#: Downloads/SponsorBlockChoice.cs */
+export interface SponsorBlockChoice {
+    Mode: SponsorBlockMode;
+    Categories: SponsorBlockCategory[];
+}
 
 /** C#: Downloads/DownloadProfile.cs */
 export interface DownloadProfile {
@@ -184,6 +249,11 @@ export interface DownloadProfile {
     LibraryId: string;
     LibraryFolder: string;
     Subfolder: string | null;
+    Naming: NamingPresetId;
+    CustomTemplate: string | null;
+    Extras: DownloadExtras;
+    Subtitles: SubtitleChoice;
+    SponsorBlock: SponsorBlockChoice;
 }
 
 /** POST /TubeDLFin/Downloads request body (C#: Downloads/DownloadRequest.cs). */

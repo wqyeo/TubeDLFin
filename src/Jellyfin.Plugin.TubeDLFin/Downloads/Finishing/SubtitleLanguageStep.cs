@@ -5,8 +5,9 @@ using Jellyfin.Plugin.TubeDLFin.Downloads.Output;
 namespace Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 
 /// <summary>
-/// Renames YouTube's original-language captions (<c>name.en-orig.srt</c>) to the plain code
-/// (<c>name.en.srt</c>): Jellyfin doesn't recognise "en-orig" and lists it as an unknown language.
+/// Renames YouTube's original-language captions (<c>name.en-orig.srt</c>), which Jellyfin lists
+/// as an unknown language: to <c>name.en.srt</c>, or to <c>name.en.orig.srt</c> (shown as
+/// "orig - English") when there already is an English file.
 /// </summary>
 public sealed class SubtitleLanguageStep : IFinishedItemStep
 {
@@ -34,10 +35,20 @@ public sealed class SubtitleLanguageStep : IFinishedItemStep
 
             // "name.en-orig.srt" → language "en".
             var language = name[(stem.Length + 1)..^(OriginalSuffix.Length + ".srt".Length)];
-            var target = Path.Combine(folder, $"{stem}.{language}.srt");
-            if (language.Length > 0 && !File.Exists(target))
+            if (language.Length == 0)
             {
-                File.Move(file, target);
+                continue;
+            }
+
+            var plain = Path.Combine(folder, $"{stem}.{language}.srt");
+            var labelled = Path.Combine(folder, $"{stem}.{language}.orig.srt");
+            if (!File.Exists(plain))
+            {
+                File.Move(file, plain);
+            }
+            else if (!File.Exists(labelled))
+            {
+                File.Move(file, labelled);
             }
         }
     }

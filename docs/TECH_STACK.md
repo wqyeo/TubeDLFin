@@ -24,6 +24,7 @@
 | Queue | `DownloadManager` (in memory, `System.Threading.Channels`) + `DownloadDispatcher` (`BackgroundService`, registered with `AddHostedService`; Jellyfin 12.2 starts it) running N jobs at once (setting, re-read every few seconds). `Enqueue(plan, source)` takes any source (`Manual`, later subscriptions). Each job: own temp folder `tmp/downloads/<id>` (`-P temp:`), yt-dlp moves finished files into the library, per-library `--download-archive <data>/archive/<libraryId>.txt`. Jobs and their snapshots are separate: only immutable `DownloadJobInfo` records leave the queue |
 | Download options | One `IDownloadOptionSet` per concern (output, progress, archive, playlist, video format, audio format), applied in registration order; M4 adds subtitles, SponsorBlock, thumbnails as more sets. Validation (`DownloadRequestValidator`) allowlists every value and keeps the destination inside the chosen library folder |
 | Progress | `--progress-template` / `--print before_dl|after_move` marker lines (`[tubedlfin:progress]` ...) read line by line from both streams (`IProcessRunner.StreamAsync`). `--print` implies quiet mode, so `--no-quiet` brings back the log (needed for "already in archive" messages and the job's Details) |
+| Naming and metadata | One `NamingPreset` per layout (registered in DI), default chosen by library type. `.nfo` per library type via `INfoBuilder` (Kodi format, `<lockdata>true`). Each finished file runs `IFinishedItemStep`s in order: subtitle language fix → `.nfo` → library refresh. Checked against Jellyfin 12.2 with hand-made files: `poster.jpg` in a movie folder, `name-thumb.jpg` for episodes, `name-poster.jpg` otherwise; `name.en.orig.srt` reads as English; **episodes sharing a number are merged as versions**, hence `SYYYYEMMDDHHMM` |
 | New files in Jellyfin | Refresh the nearest folder Jellyfin already knows (`FindByPath` walking up inside the library) with `ChangedExternally()`; if none (library never scanned with content), `QueueLibraryScan()`. Not `ILibraryMonitor.ReportFileSystemChanged`: it waits for the "library monitor delay" (60 s default) and does nothing for never-scanned libraries. Measured: items appear 0–1.5 s after the download |
 | JSON | System.Text.Json. yt-dlp's `-J` output is read with `JsonDocument` and lenient helpers (sites leave out or null whatever they lack), not mapped to fixed classes |
 | `.nfo` files | `System.Xml.Linq` |
@@ -79,6 +80,13 @@ web/                        # separate toolchain; output is embedded by src/.../
   10 s when idle, only while the page is shown. Rows are updated in place (keyed by job id), so
   an open "Details" panel survives refreshes.
 - **API types**: written by hand in `web/src/api/types.ts` for v1 (Jellyfin's JSON is PascalCase).
+- **Unit tests**: `src/**/*.test.ts` with `node:test` and `node:assert`; `test.mjs` bundles them
+  with esbuild (Node can't resolve the page's extensionless imports) and runs them. Typings for
+  those two modules are a small local declaration, so there's no `@types/node`. Only pure modules
+  are tested (request building, defaults, remembered options, formatting); views are checked in
+  a headless browser against the dev server.
+- **Remembered options**: `localStorage`, key `tubedlfin.options.v1.<music|video>`, plus the last
+  library. Naming and folder are only reused for the same library.
 
 ## Runtime tools (downloaded by the plugin, not shipped)
 

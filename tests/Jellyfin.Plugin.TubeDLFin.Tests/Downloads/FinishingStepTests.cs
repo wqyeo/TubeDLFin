@@ -57,8 +57,9 @@ public sealed class FinishingStepTests : IDisposable
         new SubtitleLanguageStep().Run(DownloadPlans.Create(), new DownloadedItem(media));
 
         var files = Directory.EnumerateFiles(_temp.Path).Select(Path.GetFileName).Order(StringComparer.Ordinal).ToList();
-        Assert.Equal(["Other [y].en-orig.srt", "Recap [x].de-orig.srt", "Recap [x].de.srt", "Recap [x].en.srt", "Recap [x].mp4"], files);
+        Assert.Equal(["Other [y].en-orig.srt", "Recap [x].de.orig.srt", "Recap [x].de.srt", "Recap [x].en.srt", "Recap [x].mp4"], files);
         Assert.Equal("orig", File.ReadAllText(_temp.Combine("Recap [x].en.srt")));
         Assert.Equal("uploaded de", File.ReadAllText(_temp.Combine("Recap [x].de.srt")));
+        Assert.Equal("de orig", File.ReadAllText(_temp.Combine("Recap [x].de.orig.srt")));
     }
 }

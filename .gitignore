@@ -13,6 +13,7 @@ artifacts/
 # Web
 web/node_modules/
 web/dist/
+web/.test-dist/
 
 # Local Jellyfin (dev/jellyfin.sh)
 dev/config/

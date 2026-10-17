@@ -136,7 +136,71 @@
                                 placeholder="e.g. YouTube" autocomplete="off" />
                         </div>
                     </div>
-                    <p class="fieldDescription">Files are named "Channel/Title [id]" inside the chosen folder.</p>
+                    <p class="fieldDescription" data-tubedlfin="download-free-space"></p>
+
+                    <div class="tubedlfin-grid">
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinNaming">File names</label>
+                            <select is="emby-select" id="TubeDLFinNaming" data-tubedlfin="download-naming"></select>
+                        </div>
+                        <div class="inputContainer" data-tubedlfin="download-custom-template-container" hidden>
+                            <label class="inputLabel inputLabelUnfocused" for="TubeDLFinCustomTemplate">yt-dlp output template</label>
+                            <input is="emby-input" type="text" id="TubeDLFinCustomTemplate" data-tubedlfin="download-custom-template"
+                                placeholder="%(channel)s/%(title)s [%(id)s].%(ext)s" autocomplete="off" spellcheck="false" />
+                        </div>
+                    </div>
+                    <p class="fieldDescription">Example: <span class="tubedlfin-path" data-tubedlfin="download-naming-example"></span></p>
+
+                    <details class="tubedlfin-details">
+                        <summary>Metadata, subtitles and SponsorBlock</summary>
+
+                        <h4>Metadata</h4>
+                        <div class="tubedlfin-checks">
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-write-nfo" /><span>Write .nfo (title, description, date for Jellyfin)</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-save-thumbnail" /><span>Save thumbnail as poster</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-embed-thumbnail" /><span>Embed thumbnail (cover art)</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-embed-metadata" /><span>Embed tags</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-embed-chapters" /><span>Embed chapters</span></label>
+                        </div>
+
+                        <h4>Subtitles</h4>
+                        <ul class="tubedlfin-chips" data-tubedlfin="download-subtitle-chips"></ul>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="TubeDLFinSubtitleLanguages">Languages</label>
+                            <input is="emby-input" type="text" id="TubeDLFinSubtitleLanguages" data-tubedlfin="download-subtitle-languages"
+                                placeholder="None" autocomplete="off" spellcheck="false" />
+                            <div class="fieldDescription">
+                                Click the languages above, or type codes: "en,de", "en.*" (every English variant) or "all".
+                                Saved as .srt next to the video.
+                            </div>
+                        </div>
+                        <div class="tubedlfin-checks">
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-subtitle-auto" /><span>Use auto-generated captions when there are no uploaded subtitles</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" data-tubedlfin="download-subtitle-embed" /><span>Also embed them in the video</span></label>
+                        </div>
+
+                        <h4>SponsorBlock</h4>
+                        <div class="tubedlfin-grid">
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="TubeDLFinSponsorBlockMode">Segments</label>
+                                <select is="emby-select" id="TubeDLFinSponsorBlockMode" data-tubedlfin="download-sponsorblock-mode">
+                                    <option value="Remove">Cut out of the video</option>
+                                    <option value="Mark">Mark as chapters</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="tubedlfin-checks" data-tubedlfin="download-sponsorblock-categories">
+                            <label><input type="checkbox" is="emby-checkbox" value="Sponsor" /><span>Sponsor</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="SelfPromo" /><span>Self-promotion</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="Interaction" /><span>"Like and subscribe"</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="Intro" /><span>Intro</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="Outro" /><span>Outro and end cards</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="Preview" /><span>Preview and recap</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="Filler" /><span>Filler and tangents</span></label>
+                            <label><input type="checkbox" is="emby-checkbox" value="MusicOffTopic" /><span>Non-music parts of music videos</span></label>
+                        </div>
+                        <p class="fieldDescription">YouTube only. Nothing is cut unless a category is ticked.</p>
+                    </details>
 
                     <div class="checkboxContainer">
                         <label>
@@ -205,6 +269,25 @@
                             data-tubedlfin="settings-max-concurrent" />
                         <div class="fieldDescription">
                             1 to 5. Keep it at 1 on a Raspberry Pi: merging and converting use the CPU.
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinCookiesFile">Cookies file</label>
+                        <input is="emby-input" type="text" id="TubeDLFinCookiesFile" data-tubedlfin="settings-cookies-file"
+                            placeholder="e.g. /config/data/tubedlfin/cookies.txt" autocomplete="off" spellcheck="false" />
+                        <div class="fieldDescription">
+                            A cookies.txt file (Netscape format) from a browser signed in to the site. Needed for
+                            age-restricted or members-only videos, and when YouTube asks the server to "sign in to confirm
+                            you're not a bot". yt-dlp also writes refreshed cookies back to it. Leave blank for none.
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinExtraArguments">Extra yt-dlp arguments</label>
+                        <input is="emby-input" type="text" id="TubeDLFinExtraArguments" data-tubedlfin="settings-extra-arguments"
+                            placeholder="e.g. --limit-rate 5M" autocomplete="off" spellcheck="false" />
+                        <div class="fieldDescription">
+                            Added to every yt-dlp run; quotes group words. Avoid options that change file names or output
+                            (-o, -P, -q, --print): TubeDLFin relies on them.
                         </div>
                     </div>
                     <p class="tubedlfin-error" data-tubedlfin="settings-error" hidden></p>

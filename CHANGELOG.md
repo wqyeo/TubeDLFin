@@ -6,6 +6,25 @@ All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.P
 ## [Unreleased]
 
 ### Added
+- Polish (M4): file naming presets chosen by library type: one folder per video for movies,
+  "Channel / Season year / SYYYYEMMDDHHMM" for shows (episode numbers from the upload date and
+  time, so same-day uploads don't merge), "Artist / Title" for music videos, "Artist / Album /
+  Title" for music, plus "Channel / Title", "Playlist / 01 - Title" and a custom yt-dlp template.
+- `.nfo` files for Movies, Home Videos, Mixed (`<movie>`), Shows (`<episodedetails>` plus the
+  channel's `tvshow.nfo`) and Music Videos (`<musicvideo>`), with `<lockdata>` so Jellyfin keeps
+  YouTube's title, description and date instead of guessing an online match. Thumbnail saved
+  as the poster Jellyfin looks for; tags, chapters and cover art can be embedded.
+- Subtitles as `.srt` next to the video (pick languages from the detected list or type codes,
+  auto-generated captions, embed). YouTube's "-orig" captions are renamed so Jellyfin knows
+  their language.
+- SponsorBlock: cut out or mark as chapters, per category.
+- The download form remembers the last options in the browser, separately for music and video;
+  choosing a music library switches to audio, the music layout and embedded cover art.
+- Free space of the destination folder, with a warning when it's low or smaller than the video.
+- Settings: cookies file (for age-restricted videos and YouTube's "sign in to confirm you're not
+  a bot"), extra yt-dlp arguments. Errors about signing in point to the cookies setting.
+- `GET /TubeDLFin/NamingPresets`; `GET /TubeDLFin/Libraries` now includes default naming and free space.
+- Frontend unit tests (Node's built-in test runner, no new dependencies), part of `npm run check`.
 - Download (M3): after detecting a link, choose Video (quality up to 2160p or a specific
   format, MP4/MKV/WebM, prefer H.264) or Audio only (original, M4A, MP3, Opus, FLAC, WAV,
   bitrate), playlist items, a library, folder and subfolder, and press Download. Files go
