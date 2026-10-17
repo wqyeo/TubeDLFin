@@ -41,6 +41,127 @@
                 </form>
 
                 <div class="verticalSection tubedlfin-result" data-tubedlfin="detect-result" hidden></div>
+
+                <form class="verticalSection tubedlfin-download" data-tubedlfin="download-form" novalidate hidden>
+                    <h3 class="sectionTitle">Download</h3>
+
+                    <div class="tubedlfin-mode" role="radiogroup" aria-label="What to keep">
+                        <label class="tubedlfin-segment-option">
+                            <input type="radio" name="TubeDLFinMode" value="Video" data-tubedlfin="download-mode-video" checked />
+                            <span>Video</span>
+                        </label>
+                        <label class="tubedlfin-segment-option">
+                            <input type="radio" name="TubeDLFinMode" value="Audio" data-tubedlfin="download-mode-audio" />
+                            <span>Audio only</span>
+                        </label>
+                    </div>
+
+                    <div class="tubedlfin-grid" data-tubedlfin="download-video-options">
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinVideoQuality">Quality</label>
+                            <select is="emby-select" id="TubeDLFinVideoQuality" data-tubedlfin="download-video-quality"></select>
+                        </div>
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinContainer">File type</label>
+                            <select is="emby-select" id="TubeDLFinContainer" data-tubedlfin="download-container">
+                                <option value="Auto">Automatic</option>
+                                <option value="Mp4">MP4 (plays everywhere)</option>
+                                <option value="Mkv">MKV</option>
+                                <option value="Webm">WebM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription" data-tubedlfin="download-h264-option">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" data-tubedlfin="download-prefer-h264" />
+                            <span>Prefer H.264 video and AAC audio</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">
+                            Plays on more devices without transcoding. YouTube offers H.264 only up to 1080p.
+                        </div>
+                    </div>
+
+                    <div class="tubedlfin-grid" data-tubedlfin="download-audio-options" hidden>
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinAudioStream">Source</label>
+                            <select is="emby-select" id="TubeDLFinAudioStream" data-tubedlfin="download-audio-stream"></select>
+                        </div>
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinAudioFormat">File type</label>
+                            <select is="emby-select" id="TubeDLFinAudioFormat" data-tubedlfin="download-audio-format">
+                                <option value="Original">Original (no re-encoding)</option>
+                                <option value="M4a">M4A (AAC)</option>
+                                <option value="Mp3">MP3</option>
+                                <option value="Opus">Opus</option>
+                                <option value="Flac">FLAC</option>
+                                <option value="Wav">WAV</option>
+                            </select>
+                        </div>
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinAudioQuality">Bitrate</label>
+                            <select is="emby-select" id="TubeDLFinAudioQuality" data-tubedlfin="download-audio-quality">
+                                <option value="best">Best</option>
+                                <option value="320">320 kbit/s</option>
+                                <option value="256">256 kbit/s</option>
+                                <option value="192">192 kbit/s</option>
+                                <option value="128">128 kbit/s</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="inputContainer" data-tubedlfin="download-playlist-options" hidden>
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinPlaylistItems">Items</label>
+                        <input is="emby-input" type="text" id="TubeDLFinPlaylistItems" data-tubedlfin="download-playlist-items"
+                            placeholder="All" autocomplete="off" spellcheck="false" />
+                        <div class="fieldDescription">
+                            Leave blank for all, or e.g. "1-10", "1,3,5" or "20:" (from item 20 to the end).
+                        </div>
+                        <div class="fieldDescription tubedlfin-warn" data-tubedlfin="download-playlist-hint" hidden>
+                            This downloads every tab and playlist listed above. Open one of them to download only its items.
+                        </div>
+                    </div>
+
+                    <div class="tubedlfin-grid">
+                        <div class="selectContainer">
+                            <label class="selectLabel" for="TubeDLFinLibrary">Library</label>
+                            <select is="emby-select" id="TubeDLFinLibrary" data-tubedlfin="download-library"></select>
+                        </div>
+                        <div class="selectContainer" data-tubedlfin="download-folder-container" hidden>
+                            <label class="selectLabel" for="TubeDLFinFolder">Folder</label>
+                            <select is="emby-select" id="TubeDLFinFolder" data-tubedlfin="download-folder"></select>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="TubeDLFinSubfolder">Subfolder (optional)</label>
+                            <input is="emby-input" type="text" id="TubeDLFinSubfolder" data-tubedlfin="download-subfolder"
+                                placeholder="e.g. YouTube" autocomplete="off" />
+                        </div>
+                    </div>
+                    <p class="fieldDescription">Files are named "Channel/Title [id]" inside the chosen folder.</p>
+
+                    <div class="checkboxContainer">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" data-tubedlfin="download-redownload" />
+                            <span>Download again even if already downloaded into this library</span>
+                        </label>
+                    </div>
+
+                    <div class="tubedlfin-actions">
+                        <button is="emby-button" type="submit" class="raised button-submit emby-button"
+                            data-tubedlfin="download-submit">Download</button>
+                        <span class="fieldDescription" data-tubedlfin="download-status" aria-live="polite"></span>
+                    </div>
+                    <p class="tubedlfin-error" data-tubedlfin="download-error" role="alert" hidden></p>
+                </form>
+
+                <div class="verticalSection" data-tubedlfin="queue">
+                    <div class="tubedlfin-section-header">
+                        <h3 class="sectionTitle">Queue</h3>
+                        <button type="button" class="tubedlfin-small-button" data-tubedlfin="queue-clear" hidden>Clear finished</button>
+                    </div>
+                    <p class="fieldDescription" data-tubedlfin="queue-empty">No downloads yet.</p>
+                    <div class="tubedlfin-queue" data-tubedlfin="queue-list"></div>
+                    <p class="tubedlfin-error" data-tubedlfin="queue-error" hidden></p>
+                </div>
                 </div>
 
                 <div data-tubedlfin-panel="settings" role="tabpanel" hidden>
@@ -76,6 +197,14 @@
                         <div class="fieldDescription">
                             Leave blank to let TubeDLFin manage Deno. Needed on systems without a prebuilt
                             Deno, such as Alpine (musl).
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinMaxConcurrent">Downloads at the same time</label>
+                        <input is="emby-input" type="number" min="1" max="5" step="1" id="TubeDLFinMaxConcurrent"
+                            data-tubedlfin="settings-max-concurrent" />
+                        <div class="fieldDescription">
+                            1 to 5. Keep it at 1 on a Raspberry Pi: merging and converting use the CPU.
                         </div>
                     </div>
                     <p class="tubedlfin-error" data-tubedlfin="settings-error" hidden></p>

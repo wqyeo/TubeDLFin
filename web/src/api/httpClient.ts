@@ -8,6 +8,8 @@ export interface RequestOptions {
 export interface HttpClient {
     getJson<T>(path: string, options?: RequestOptions): Promise<T>;
     postJson<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
+    /** Sends a DELETE; resolves when the server accepted it (no response body expected). */
+    delete(path: string, options?: RequestOptions): Promise<void>;
 }
 
 /** The server answered with an error status. `detail` is the server's explanation, if it gave one. */
@@ -37,6 +39,10 @@ export class JellyfinHttpClient implements HttpClient {
         return this.send<T>('POST', path, body, options);
     }
 
+    async delete(path: string, options?: RequestOptions): Promise<void> {
+        await this.send<unknown>('DELETE', path, undefined, options);
+    }
+
     private async send<T>(method: string, path: string, body: unknown, options?: RequestOptions): Promise<T> {
         const headers: Record<string, string> = { Accept: 'application/json' };
         this.apiClient.setRequestHeaders(headers);
@@ -59,7 +65,9 @@ export class JellyfinHttpClient implements HttpClient {
             );
         }
 
-        return (await response.json()) as T;
+        // 204 No Content (and other empty answers) have no JSON to read.
+        const text = await response.text();
+        return (text ? JSON.parse(text) : undefined) as T;
     }
 }
 

@@ -21,7 +21,10 @@
 | Jellyfin packages | `Jellyfin.Controller` + `Jellyfin.Model` **12.2.0**, `ExcludeAssets=runtime`; `targetAbi` `12.2.0.0` |
 | Third-party runtime dependencies | **None.** Only the .NET base libraries plus what the Jellyfin host already loads (ASP.NET Core MVC, DI, logging, `IHttpClientFactory`, System.Text.Json). Extra DLLs risk version clashes with the server |
 | Running yt-dlp / Deno | `System.Diagnostics.Process` with `ArgumentList` (never a shell); cancel with `Kill(entireProcessTree: true)` |
-| Queue | `System.Threading.Channels` + N workers behind `DownloadManager.Enqueue(profile, url, source)` |
+| Queue | `DownloadManager` (in memory, `System.Threading.Channels`) + `DownloadDispatcher` (`BackgroundService`, registered with `AddHostedService`; Jellyfin 12.2 starts it) running N jobs at once (setting, re-read every few seconds). `Enqueue(plan, source)` takes any source (`Manual`, later subscriptions). Each job: own temp folder `tmp/downloads/<id>` (`-P temp:`), yt-dlp moves finished files into the library, per-library `--download-archive <data>/archive/<libraryId>.txt`. Jobs and their snapshots are separate: only immutable `DownloadJobInfo` records leave the queue |
+| Download options | One `IDownloadOptionSet` per concern (output, progress, archive, playlist, video format, audio format), applied in registration order; M4 adds subtitles, SponsorBlock, thumbnails as more sets. Validation (`DownloadRequestValidator`) allowlists every value and keeps the destination inside the chosen library folder |
+| Progress | `--progress-template` / `--print before_dl|after_move` marker lines (`[tubedlfin:progress]` ...) read line by line from both streams (`IProcessRunner.StreamAsync`). `--print` implies quiet mode, so `--no-quiet` brings back the log (needed for "already in archive" messages and the job's Details) |
+| New files in Jellyfin | Refresh the nearest folder Jellyfin already knows (`FindByPath` walking up inside the library) with `ChangedExternally()`; if none (library never scanned with content), `QueueLibraryScan()`. Not `ILibraryMonitor.ReportFileSystemChanged`: it waits for the "library monitor delay" (60 s default) and does nothing for never-scanned libraries. Measured: items appear 0–1.5 s after the download |
 | JSON | System.Text.Json. yt-dlp's `-J` output is read with `JsonDocument` and lenient helpers (sites leave out or null whatever they lack), not mapped to fixed classes |
 | `.nfo` files | `System.Xml.Linq` |
 | Tool install | One `IToolDefinition` per tool (asset per platform, checksum file, version parsing); add a tool by registering another. Latest release read from the `github.com/<repo>/releases/latest` redirect (no REST API, so no 60/h limit). Download → SHA-256 check against the published list → unzip (Deno) → `chmod 755` → run `--version` on the new copy → atomic rename over the old one. A broken download never replaces a working tool |
@@ -72,7 +75,9 @@ web/                        # separate toolchain; output is embedded by src/.../
   can cancel them (Cancel button, leaving the page).
 - **Untrusted text**: titles and names from sites only ever go in through `textContent`; links
   must be http(s) and open with `rel="noopener noreferrer"`.
-- **Queue updates**: poll `GET /TubeDLFin/Downloads` every 1–2 s while the page is visible.
+- **Queue updates**: poll `GET /TubeDLFin/Downloads` every 1.5 s while a job is active and every
+  10 s when idle, only while the page is shown. Rows are updated in place (keyed by job id), so
+  an open "Details" panel survives refreshes.
 - **API types**: written by hand in `web/src/api/types.ts` for v1 (Jellyfin's JSON is PascalCase).
 
 ## Runtime tools (downloaded by the plugin, not shipped)

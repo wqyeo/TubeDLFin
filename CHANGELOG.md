@@ -6,6 +6,20 @@ All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.P
 ## [Unreleased]
 
 ### Added
+- Download (M3): after detecting a link, choose Video (quality up to 2160p or a specific
+  format, MP4/MKV/WebM, prefer H.264) or Audio only (original, M4A, MP3, Opus, FLAC, WAV,
+  bitrate), playlist items, a library, folder and subfolder, and press Download. Files go
+  straight into the library as `Channel/Title [id].ext` and appear in Jellyfin within seconds,
+  without a library scan, even in a library that was empty until then.
+- Download queue on the Download tab: progress, speed, time left, "item 3 of 12", cancel,
+  remove, clear finished, and per-job details (files and the yt-dlp log). States include
+  "Completed with errors" (some playlist items failed) and "Already downloaded".
+- Each library keeps a download archive, so nothing is downloaded into it twice; a checkbox
+  downloads again anyway. Partial files stay in TubeDLFin's own temp folder until finished.
+- Setting "Downloads at the same time" (default 1).
+- `GET /TubeDLFin/Libraries`, `GET/POST /TubeDLFin/Downloads`, `GET /TubeDLFin/Downloads/{id}/Log`,
+  `POST /TubeDLFin/Downloads/{id}/Cancel`, `DELETE /TubeDLFin/Downloads/{id}`,
+  `POST /TubeDLFin/Downloads/ClearFinished` (admin only).
 - Detect (M2): paste a link on the new **Download** tab to see what it points to. Videos show
   title, thumbnail, uploader, length, date, music tags (artist, album, year), every video and
   audio format, and uploaded vs auto-generated subtitles. Playlists and channels list their

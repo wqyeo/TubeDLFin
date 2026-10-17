@@ -221,3 +221,143 @@
     margin-left: 0.5em;
     padding: 0.2em 0.8em;
 }
+
+/* Download options */
+.tubedlfin-mode {
+    display: flex;
+    gap: 0.5em;
+    margin-bottom: 1.2em;
+}
+
+.tubedlfin-segment-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.tubedlfin-segment-option span {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 0.2em;
+    cursor: pointer;
+    display: inline-block;
+    padding: 0.5em 1.2em;
+}
+
+.tubedlfin-segment-option input:checked + span {
+    background: #00a4dc;
+    color: #fff;
+}
+
+.tubedlfin-segment-option input:focus-visible + span {
+    outline: 2px solid #00a4dc;
+    outline-offset: 2px;
+}
+
+.tubedlfin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+    column-gap: 1.5em;
+}
+
+.tubedlfin-warn {
+    color: #e6b800;
+}
+
+/* Queue */
+.tubedlfin-section-header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.tubedlfin-job {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75em 0;
+}
+
+.tubedlfin-job-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+}
+
+.tubedlfin-job-title {
+    flex: 1;
+    font-weight: 500;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.tubedlfin-job-title a {
+    color: inherit;
+}
+
+.tubedlfin-job-buttons .tubedlfin-small-button {
+    margin-left: 0.4em;
+}
+
+.tubedlfin-job-meta {
+    font-size: 0.9em;
+    margin-top: 0.3em;
+    opacity: 0.75;
+    overflow-wrap: anywhere;
+}
+
+.tubedlfin-job-error {
+    color: #ff6b6b;
+    margin-top: 0.3em;
+}
+
+.tubedlfin-job-error.tubedlfin-warn {
+    color: #e6b800;
+}
+
+.tubedlfin-badge {
+    border-radius: 1em;
+    flex: none;
+    font-size: 0.8em;
+    padding: 0.15em 0.7em;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.tubedlfin-badge-busy {
+    background: #00a4dc;
+    color: #fff;
+}
+
+.tubedlfin-badge-good {
+    background: #3f8a39;
+    color: #fff;
+}
+
+.tubedlfin-badge-warn {
+    background: #a88400;
+    color: #fff;
+}
+
+.tubedlfin-badge-bad {
+    background: #b33a3a;
+    color: #fff;
+}
+
+.tubedlfin-progress {
+    accent-color: #00a4dc;
+    height: 0.5em;
+    margin-top: 0.5em;
+    width: 100%;
+}
+
+.tubedlfin-files {
+    margin: 0.4em 0;
+    padding-left: 1.2em;
+}
+
+.tubedlfin-log {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.3em;
+    font-size: 0.8em;
+    max-height: 20em;
+    overflow: auto;
+    padding: 0.75em;
+    white-space: pre-wrap;
+    word-break: break-all;
+}

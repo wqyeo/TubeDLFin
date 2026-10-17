@@ -18,6 +18,7 @@ export class JellyfinSettingsStore implements SettingsStore {
         return {
             YtDlpPath: stringOrEmpty(configuration.YtDlpPath),
             DenoPath: stringOrEmpty(configuration.DenoPath),
+            MaxConcurrentDownloads: positiveIntegerOr(configuration.MaxConcurrentDownloads, 1),
         };
     }
 
@@ -30,4 +31,8 @@ export class JellyfinSettingsStore implements SettingsStore {
 
 function stringOrEmpty(value: unknown): string {
     return typeof value === 'string' ? value : '';
+}
+
+function positiveIntegerOr(value: unknown, fallback: number): number {
+    return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : fallback;
 }

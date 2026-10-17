@@ -5,6 +5,7 @@ export interface SettingsFormElements {
     form: HTMLFormElement;
     ytDlpPath: HTMLInputElement;
     denoPath: HTMLInputElement;
+    maxConcurrentDownloads: HTMLInputElement;
     error: HTMLElement;
 }
 
@@ -18,6 +19,11 @@ export class SettingsForm {
             handler({
                 YtDlpPath: this.elements.ytDlpPath.value.trim(),
                 DenoPath: this.elements.denoPath.value.trim(),
+                MaxConcurrentDownloads: clamp(
+                    Number.parseInt(this.elements.maxConcurrentDownloads.value, 10),
+                    1,
+                    5,
+                ),
             });
         });
     }
@@ -25,6 +31,7 @@ export class SettingsForm {
     show(settings: TubeDLFinSettings): void {
         this.elements.ytDlpPath.value = settings.YtDlpPath;
         this.elements.denoPath.value = settings.DenoPath;
+        this.elements.maxConcurrentDownloads.value = String(settings.MaxConcurrentDownloads);
         this.elements.error.hidden = true;
     }
 
@@ -32,4 +39,8 @@ export class SettingsForm {
         this.elements.error.textContent = message;
         this.elements.error.hidden = false;
     }
+}
+
+function clamp(value: number, min: number, max: number): number {
+    return Number.isNaN(value) ? min : Math.min(Math.max(value, min), max);
 }

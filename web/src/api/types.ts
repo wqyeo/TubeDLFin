@@ -73,6 +73,7 @@ export interface ToolsOverview {
 export interface TubeDLFinSettings {
     YtDlpPath: string;
     DenoPath: string;
+    MaxConcurrentDownloads: number;
 }
 
 /** POST /TubeDLFin/Probe request body (C#: Api/ProbeRequest.cs). */
@@ -150,4 +151,92 @@ export interface ProbeResult {
     IsTruncated: boolean;
     HasPlaylistChoice: boolean;
     Warnings: string[];
+}
+
+/** C#: Libraries/LibraryType.cs */
+export type LibraryType = 'Movies' | 'Shows' | 'Music' | 'MusicVideos' | 'HomeVideos' | 'Mixed';
+
+/** GET /TubeDLFin/Libraries (C#: Libraries/LibraryInfo.cs). */
+export interface LibraryInfo {
+    Id: string;
+    Name: string;
+    Type: LibraryType;
+    Folders: string[];
+}
+
+/** C#: Downloads/DownloadMode.cs */
+export type DownloadMode = 'Video' | 'Audio';
+
+/** C#: Downloads/VideoContainer.cs */
+export type VideoContainer = 'Auto' | 'Mp4' | 'Mkv' | 'Webm';
+
+/** C#: Downloads/AudioFormat.cs */
+export type AudioFormat = 'Original' | 'M4a' | 'Mp3' | 'Opus' | 'Flac' | 'Wav';
+
+/** C#: Downloads/DownloadProfile.cs */
+export interface DownloadProfile {
+    Mode: DownloadMode;
+    MaxHeight: number | null;
+    Container: VideoContainer;
+    PreferH264: boolean;
+    AudioFormat: AudioFormat;
+    AudioQuality: number | null;
+    LibraryId: string;
+    LibraryFolder: string;
+    Subfolder: string | null;
+}
+
+/** POST /TubeDLFin/Downloads request body (C#: Downloads/DownloadRequest.cs). */
+export interface DownloadRequest {
+    Url: string;
+    NoPlaylist: boolean;
+    FormatId: string | null;
+    PlaylistItems: string | null;
+    Redownload: boolean;
+    Title: string | null;
+    Profile: DownloadProfile;
+}
+
+/** C#: Downloads/DownloadState.cs */
+export type DownloadState =
+    | 'Queued'
+    | 'Downloading'
+    | 'Processing'
+    | 'Completed'
+    | 'CompletedWithErrors'
+    | 'AlreadyDownloaded'
+    | 'Failed'
+    | 'Cancelled';
+
+/** GET /TubeDLFin/Downloads (C#: Downloads/DownloadJobInfo.cs). */
+export interface DownloadJobInfo {
+    Id: string;
+    Url: string;
+    Title?: string | null;
+    Source: string;
+    LibraryName: string;
+    Destination: string;
+    State: DownloadState;
+    Stage?: string | null;
+    Percent?: number | null;
+    DownloadedBytes?: number | null;
+    TotalBytes?: number | null;
+    Speed?: number | null;
+    Eta?: number | null;
+    ItemIndex?: number | null;
+    ItemCount?: number | null;
+    ItemTitle?: string | null;
+    Files: string[];
+    FailedItems: number;
+    SkippedItems: number;
+    Error?: string | null;
+    CreatedAt: string;
+    StartedAt?: string | null;
+    FinishedAt?: string | null;
+    IsFinished: boolean;
+}
+
+/** POST /TubeDLFin/Downloads/ClearFinished (C#: Api/ClearFinishedResult.cs). */
+export interface ClearFinishedResult {
+    Removed: number;
 }
