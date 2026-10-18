@@ -18,6 +18,12 @@ public sealed record PlaylistEntry
     public string? Id { get; init; }
 
     /// <summary>
+    /// Gets yt-dlp's extractor for the item (<c>Youtube</c>), which with <see cref="Id"/> makes its
+    /// download archive entry.
+    /// </summary>
+    public string? Extractor { get; init; }
+
+    /// <summary>
     /// Gets the title, or the id if the site gave none.
     /// </summary>
     public required string Title { get; init; }

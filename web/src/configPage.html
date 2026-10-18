@@ -16,6 +16,7 @@
                     <p>Download videos and music with yt-dlp straight into your Jellyfin libraries.</p>
                     <div class="tubedlfin-tabs" role="tablist">
                         <button type="button" role="tab" class="tubedlfin-tab" data-tubedlfin-tab="download">Download</button>
+                        <button type="button" role="tab" class="tubedlfin-tab" data-tubedlfin-tab="subscriptions">Subscriptions</button>
                         <button type="button" role="tab" class="tubedlfin-tab" data-tubedlfin-tab="settings">Tools &amp; settings</button>
                     </div>
                 </div>
@@ -226,6 +227,31 @@
                         <span class="fieldDescription" data-tubedlfin="download-status" aria-live="polite"></span>
                     </div>
                     <p class="tubedlfin-error" data-tubedlfin="download-error" role="alert" hidden></p>
+
+                    <div class="tubedlfin-subscribe" data-tubedlfin="subscribe" hidden>
+                        <h4>Or subscribe</h4>
+                        <p class="fieldDescription">
+                            Check this channel or playlist on a schedule and download its new uploads with the
+                            options above. The videos it has now are not downloaded.
+                        </p>
+                        <div class="tubedlfin-grid">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="TubeDLFinSubscribeName">Name</label>
+                                <input is="emby-input" type="text" id="TubeDLFinSubscribeName" data-tubedlfin="subscribe-name"
+                                    maxlength="200" autocomplete="off" />
+                            </div>
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="TubeDLFinSubscribeInterval">Check</label>
+                                <select is="emby-select" id="TubeDLFinSubscribeInterval" data-tubedlfin="subscribe-interval"></select>
+                            </div>
+                        </div>
+                        <div class="tubedlfin-actions">
+                            <button is="emby-button" type="button" class="raised emby-button"
+                                data-tubedlfin="subscribe-submit">Subscribe</button>
+                            <span class="fieldDescription" data-tubedlfin="subscribe-status" aria-live="polite"></span>
+                        </div>
+                        <p class="tubedlfin-error" data-tubedlfin="subscribe-error" role="alert" hidden></p>
+                    </div>
                 </form>
 
                 <div class="verticalSection" data-tubedlfin="queue">
@@ -236,6 +262,20 @@
                     <p class="fieldDescription" data-tubedlfin="queue-empty">No downloads yet.</p>
                     <div class="tubedlfin-queue" data-tubedlfin="queue-list"></div>
                     <p class="tubedlfin-error" data-tubedlfin="queue-error" hidden></p>
+                </div>
+                </div>
+
+                <div data-tubedlfin-panel="subscriptions" role="tabpanel" hidden>
+                <div class="verticalSection">
+                    <h3 class="sectionTitle">Subscriptions</h3>
+                    <p class="fieldDescription">
+                        TubeDLFin checks each channel or playlist on its schedule and downloads new uploads with
+                        the options chosen when subscribing (Dashboard → Scheduled Tasks → "Check subscriptions"
+                        runs every 15 minutes). To subscribe, detect a channel or playlist on the Download tab.
+                    </p>
+                    <p class="fieldDescription" data-tubedlfin="subscriptions-empty">No subscriptions yet.</p>
+                    <div class="tubedlfin-queue" data-tubedlfin="subscriptions-list"></div>
+                    <p class="tubedlfin-error" data-tubedlfin="subscriptions-error" role="alert" hidden></p>
                 </div>
                 </div>
 

@@ -140,6 +140,7 @@ public class ProbeResultParserTests
         var first = result.Entries[0];
         Assert.Equal(("VZ5022VaMmA", "Keynote — Blender Conference 2024", 1792.0, "Blender"), (first.Id, first.Title, first.Duration!.Value, first.Uploader));
         Assert.Equal(new Uri("https://www.youtube.com/watch?v=VZ5022VaMmA"), first.Url);
+        Assert.Equal("Youtube", first.Extractor);
         Assert.False(first.IsCollection);
     }
 

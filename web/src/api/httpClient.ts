@@ -8,6 +8,7 @@ export interface RequestOptions {
 export interface HttpClient {
     getJson<T>(path: string, options?: RequestOptions): Promise<T>;
     postJson<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
+    putJson<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
     /** Sends a DELETE; resolves when the server accepted it (no response body expected). */
     delete(path: string, options?: RequestOptions): Promise<void>;
 }
@@ -37,6 +38,10 @@ export class JellyfinHttpClient implements HttpClient {
 
     postJson<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
         return this.send<T>('POST', path, body, options);
+    }
+
+    putJson<T>(path: string, body: unknown, options?: RequestOptions): Promise<T> {
+        return this.send<T>('PUT', path, body, options);
     }
 
     async delete(path: string, options?: RequestOptions): Promise<void> {

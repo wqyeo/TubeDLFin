@@ -42,4 +42,7 @@ public sealed class PluginPaths : IPluginPaths
 
     /// <inheritdoc />
     public string ArchiveDirectory => Path.Combine(DataRoot, "archive");
+
+    /// <inheritdoc />
+    public string SubscriptionsFile => Path.Combine(DataRoot, "subscriptions.json");
 }

@@ -18,12 +18,6 @@ namespace Jellyfin.Plugin.TubeDLFin.Detection;
 /// </summary>
 public sealed partial class YtDlpMediaProber : IMediaProber
 {
-    /// <summary>
-    /// How many playlist or channel items are listed. Listing a long channel takes about a second
-    /// per 10 items, so the first detection stays quick; downloads aren't limited by this.
-    /// </summary>
-    public const int EntryLimit = 100;
-
     private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(2);
 
     private readonly IYtDlpCommandFactory _commands;
@@ -59,16 +53,17 @@ public sealed partial class YtDlpMediaProber : IMediaProber
     }
 
     /// <inheritdoc />
-    public async Task<ProbeResult> ProbeAsync(MediaUrl url, bool noPlaylist, CancellationToken cancellationToken)
+    public async Task<ProbeResult> ProbeAsync(MediaUrl url, bool noPlaylist, int entryLimit, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(url);
+        ArgumentOutOfRangeException.ThrowIfLessThan(entryLimit, 1);
 
         var options = new List<string>
         {
             "--dump-single-json",
             "--flat-playlist",
             "--playlist-items",
-            string.Create(CultureInfo.InvariantCulture, $"1:{EntryLimit}"),
+            string.Create(CultureInfo.InvariantCulture, $"1:{entryLimit}"),
         };
         if (noPlaylist)
         {
@@ -106,7 +101,7 @@ public sealed partial class YtDlpMediaProber : IMediaProber
         ProbeResult parsed;
         try
         {
-            parsed = _parser.Parse(json, EntryLimit);
+            parsed = _parser.Parse(json, entryLimit);
         }
         catch (JsonException ex)
         {

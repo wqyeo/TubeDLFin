@@ -39,4 +39,9 @@ public interface IPluginPaths
     /// into it, so nothing is downloaded twice.
     /// </summary>
     string ArchiveDirectory { get; }
+
+    /// <summary>
+    /// Gets the file holding the subscriptions.
+    /// </summary>
+    string SubscriptionsFile { get; }
 }

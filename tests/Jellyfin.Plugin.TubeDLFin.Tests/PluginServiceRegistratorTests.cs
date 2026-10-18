@@ -5,6 +5,7 @@ using Jellyfin.Plugin.TubeDLFin.Detection;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Finishing;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Jobs;
 using Jellyfin.Plugin.TubeDLFin.Downloads.Options;
+using Jellyfin.Plugin.TubeDLFin.Subscriptions;
 using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
 using Jellyfin.Plugin.TubeDLFin.Tools.Status;
 using Jellyfin.Plugin.TubeDLFin.Tools.Updates;
@@ -53,5 +54,7 @@ public class PluginServiceRegistratorTests
         Assert.Equal(11, provider.GetServices<IDownloadOptionSet>().Count());
         Assert.IsType<LibraryRefreshStep>(provider.GetServices<IFinishedItemStep>().Last());
         Assert.NotNull(new UpdateToolsTask(provider.GetRequiredService<IToolUpdateService>()));
+        Assert.NotNull(new CheckSubscriptionsTask(provider.GetRequiredService<ISubscriptionService>()));
+        Assert.IsType<YouTubeFeedResolver>(Assert.Single(provider.GetServices<ISubscriptionFeedResolver>()));
     }
 }

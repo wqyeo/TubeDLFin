@@ -42,6 +42,8 @@ libraries, named and tagged so Jellyfin shows it properly.
 - **SponsorBlock**: cut out or mark sponsor segments, intros, outros and more.
 - **Queue** with progress, speed, cancel and a log per download. Each library keeps an archive,
   so nothing is downloaded into it twice.
+- **Subscriptions**: follow a channel or playlist and its new uploads are downloaded
+  automatically, on a schedule you choose.
 
 ![The download queue](docs/images/queue.png)
 
@@ -126,6 +128,37 @@ so keep the file private.
 
 ![Downloaded films in a Jellyfin Movies library](docs/images/jellyfin.png)
 
+### Subscriptions
+
+To download a channel's or playlist's new uploads automatically:
+
+1. Detect the channel or playlist on the **Download** tab and set the options as for a download.
+   A **Shows** library with the "TV show" layout works well: each channel becomes a show with
+   one season per year.
+2. Under **Or subscribe**, pick a name and how often to check (every hour to every week), and
+   press **Subscribe**.
+
+The videos the channel has at that moment are *not* downloaded; only later uploads are. To get
+some older videos too, download them once from the Download tab: the archive keeps them from
+being downloaded twice.
+
+The **Subscriptions** tab shows when each was last and will next be checked, how many uploads
+were downloaded, and any problem. **Check now** looks for new uploads straight away. The checks
+run as the scheduled task "Check subscriptions" (every 15 minutes, under Dashboard → Scheduled
+Tasks); each subscription is only checked when its own interval is up.
+
+- New uploads go through the normal queue, at most 10 per check; the rest come with the next checks.
+- A failed upload (a premiere that hasn't started, a temporary 403) is tried again on the next
+  checks, 3 times in all.
+- For a YouTube channel, its Videos tab is checked; Shorts and live streams are not, unless you
+  subscribe to the `/shorts` or `/streams` link.
+- Changing a subscription's download options isn't possible on the page yet: delete it and
+  subscribe again (nothing already downloaded is downloaded again).
+- Subscriptions are saved in `subscriptions.json` in the data folder (see [Docker](#docker)).
+  Deleting one keeps its files.
+
+Checking many channels often can make YouTube limit the server; a cookies file helps.
+
 ## Troubleshooting
 
 | Problem | What to do |
@@ -136,6 +169,7 @@ so keep the file private.
 | HTTP 403 or 429 | The site is limiting this server. Wait a while; cookies help with YouTube |
 | yt-dlp or Deno "not ready" | **Tools & settings → Update now**, and check Jellyfin's log. The server needs access to `github.com` |
 | Formats missing or "Requested format is not available" | Update yt-dlp (it is updated daily; sites change often). Check that Deno shows as ready |
+| A subscription shows a problem | Its last error says why. "Choose a library": the library was removed, so delete the subscription and subscribe again. Site errors are retried at the next check |
 | A download isn't in Jellyfin | Check it was saved into a folder of that library, and that the library type matches (music into a Music library) |
 | Anything else | Open the job's **Details** and include the log in a [bug report](https://gitlab.com/wqyeo/jellyfin-plugin-tubedlfin/-/issues/new?issuable_template=Bug) |
 

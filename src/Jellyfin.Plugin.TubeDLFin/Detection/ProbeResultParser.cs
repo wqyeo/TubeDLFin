@@ -152,6 +152,7 @@ public sealed class ProbeResultParser : IProbeResultParser
             {
                 Index = entries.Count + 1,
                 Id = entry.String("id"),
+                Extractor = entry.String("ie_key") ?? entry.String("extractor_key"),
                 Title = entry.String("title") ?? entry.String("id") ?? "Untitled",
                 Url = HttpUrl(entry.String("url")) ?? HttpUrl(entry.String("webpage_url")),
                 Duration = entry.Number("duration"),

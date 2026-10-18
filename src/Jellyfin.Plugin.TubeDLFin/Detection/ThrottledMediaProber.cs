@@ -28,12 +28,12 @@ public sealed class ThrottledMediaProber : IMediaProber, IDisposable
     }
 
     /// <inheritdoc />
-    public async Task<ProbeResult> ProbeAsync(MediaUrl url, bool noPlaylist, CancellationToken cancellationToken)
+    public async Task<ProbeResult> ProbeAsync(MediaUrl url, bool noPlaylist, int entryLimit, CancellationToken cancellationToken)
     {
         await _slots.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            return await _inner.ProbeAsync(url, noPlaylist, cancellationToken).ConfigureAwait(false);
+            return await _inner.ProbeAsync(url, noPlaylist, entryLimit, cancellationToken).ConfigureAwait(false);
         }
         finally
         {

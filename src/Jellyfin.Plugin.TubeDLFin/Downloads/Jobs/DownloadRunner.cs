@@ -28,6 +28,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
     private readonly IYtDlpOutputParser _parser;
     private readonly IEnumerable<IFinishedItemStep> _finishingSteps;
     private readonly IYtDlpErrorExplainer _explainer;
+    private readonly IDownloadArchive _archive;
     private readonly IPluginPaths _paths;
     private readonly TimeProvider _time;
     private readonly ILogger<DownloadRunner> _logger;
@@ -41,6 +42,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
     /// <param name="parser">Reads yt-dlp's output.</param>
     /// <param name="finishingSteps">Run on each finished file, in order (the last tells Jellyfin).</param>
     /// <param name="explainer">Turns errors into advice.</param>
+    /// <param name="archive">The libraries' download archives.</param>
     /// <param name="paths">The plugin's folders.</param>
     /// <param name="time">The clock.</param>
     /// <param name="logger">The logger.</param>
@@ -51,6 +53,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
         IYtDlpOutputParser parser,
         IEnumerable<IFinishedItemStep> finishingSteps,
         IYtDlpErrorExplainer explainer,
+        IDownloadArchive archive,
         IPluginPaths paths,
         TimeProvider time,
         ILogger<DownloadRunner> logger)
@@ -61,6 +64,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
         _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         _finishingSteps = finishingSteps ?? throw new ArgumentNullException(nameof(finishingSteps));
         _explainer = explainer ?? throw new ArgumentNullException(nameof(explainer));
+        _archive = archive ?? throw new ArgumentNullException(nameof(archive));
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
         _time = time ?? throw new ArgumentNullException(nameof(time));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -83,12 +87,7 @@ public sealed partial class DownloadRunner : IDownloadRunner
             Directory.CreateDirectory(job.Plan.Destination);
             Directory.CreateDirectory(tempDirectory);
 
-            string? archive = null;
-            if (!job.Plan.Redownload)
-            {
-                Directory.CreateDirectory(_paths.ArchiveDirectory);
-                archive = Path.Combine(_paths.ArchiveDirectory, ArchiveFileName(job.Plan.Library.Id));
-            }
+            var archive = job.Plan.Redownload ? null : _archive.PrepareFile(job.Plan.Library.Id);
 
             var options = _arguments.Build(job.Plan, new DownloadLocations(tempDirectory, archive));
             var request = await _commands.CreateAsync(options, job.Plan.Url, stoppingToken).ConfigureAwait(false);
@@ -133,10 +132,6 @@ public sealed partial class DownloadRunner : IDownloadRunner
         var result = job.Snapshot();
         LogFinished(job.Id, result.State, result.Files.Count, result.Error ?? "none");
     }
-
-    // The library id is Jellyfin's GUID, but keep only safe characters anyway: it names a file.
-    private static string ArchiveFileName(string libraryId) =>
-        string.Concat(libraryId.Where(c => char.IsAsciiLetterOrDigit(c) || c == '-')) + ".txt";
 
     private void OnLine(DownloadJob job, ProcessOutputLine line)
     {

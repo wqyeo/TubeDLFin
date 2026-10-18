@@ -7,6 +7,9 @@ import type {
     NamingPreset,
     ProbeRequest,
     ProbeResult,
+    SubscriptionInfo,
+    SubscriptionRequest,
+    SubscriptionUpdate,
     ToolsOverview,
     TubeDLFinInfo,
 } from './types';
@@ -69,4 +72,35 @@ export class TubeDLFinApi {
     clearFinishedDownloads(): Promise<ClearFinishedResult> {
         return this.http.postJson<ClearFinishedResult>(`${routePrefix}/Downloads/ClearFinished`);
     }
+
+    getSubscriptions(): Promise<SubscriptionInfo[]> {
+        return this.http.getJson<SubscriptionInfo[]>(`${routePrefix}/Subscriptions`);
+    }
+
+    /** Lists the channel or playlist (a few seconds) and subscribes to it. */
+    addSubscription(request: SubscriptionRequest): Promise<SubscriptionInfo> {
+        return this.http.postJson<SubscriptionInfo>(`${routePrefix}/Subscriptions`, request);
+    }
+
+    updateSubscription(id: string, update: SubscriptionUpdate): Promise<SubscriptionInfo> {
+        return this.http.putJson<SubscriptionInfo>(subscriptionPath(id), update);
+    }
+
+    /** Deletes a subscription; downloaded files and queued downloads are kept. */
+    deleteSubscription(id: string): Promise<void> {
+        return this.http.delete(subscriptionPath(id));
+    }
+
+    /** Checks now and queues new uploads; resolves with the subscription after the check. */
+    checkSubscription(id: string): Promise<SubscriptionInfo> {
+        return this.http.postJson<SubscriptionInfo>(`${subscriptionPath(id)}/Check`);
+    }
+
+    setSubscriptionPaused(id: string, paused: boolean): Promise<SubscriptionInfo> {
+        return this.http.postJson<SubscriptionInfo>(`${subscriptionPath(id)}/${paused ? 'Pause' : 'Resume'}`);
+    }
+}
+
+function subscriptionPath(id: string): string {
+    return `${routePrefix}/Subscriptions/${encodeURIComponent(id)}`;
 }

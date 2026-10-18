@@ -393,3 +393,36 @@
     background: #00a4dc;
     color: #fff;
 }
+
+.tubedlfin-subscribe {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 1.5em;
+    padding-top: 0.5em;
+}
+
+/* :not([hidden]): display would otherwise override the hidden attribute. */
+.tubedlfin-subscription-edit:not([hidden]) {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+
+.tubedlfin-inline-input {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.2em;
+    color: inherit;
+    font: inherit;
+    padding: 0.3em 0.5em;
+}
+
+.tubedlfin-inline-input option {
+    background: #202020;
+}
+
+input.tubedlfin-inline-input {
+    flex: 1;
+    min-width: 12em;
+}

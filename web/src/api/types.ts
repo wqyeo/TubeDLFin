@@ -321,3 +321,36 @@ export interface DownloadJobInfo {
 export interface ClearFinishedResult {
     Removed: number;
 }
+
+/** POST /TubeDLFin/Subscriptions request body (C#: Subscriptions/SubscriptionRequest.cs). */
+export interface SubscriptionRequest {
+    Url: string;
+    Name: string | null;
+    IntervalHours: number | null;
+    Profile: DownloadProfile;
+}
+
+/** PUT /TubeDLFin/Subscriptions/{id} body; null keeps a value (C#: Subscriptions/SubscriptionUpdate.cs). */
+export interface SubscriptionUpdate {
+    Name?: string | null;
+    IntervalHours?: number | null;
+    Profile?: DownloadProfile | null;
+}
+
+/** GET /TubeDLFin/Subscriptions (C#: Subscriptions/SubscriptionInfo.cs). */
+export interface SubscriptionInfo {
+    Id: string;
+    Name: string;
+    Url: string;
+    LibraryName?: string | null;
+    IntervalHours: number;
+    Paused: boolean;
+    CreatedAt: string;
+    LastCheckedAt?: string | null;
+    NextCheckAt: string;
+    LastError?: string | null;
+    Downloaded: number;
+    Queued: number;
+    GivenUp: number;
+    Profile: DownloadProfile;
+}

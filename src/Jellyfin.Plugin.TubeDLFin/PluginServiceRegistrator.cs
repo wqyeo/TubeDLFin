@@ -12,6 +12,7 @@ using Jellyfin.Plugin.TubeDLFin.Libraries;
 using Jellyfin.Plugin.TubeDLFin.Platform;
 using Jellyfin.Plugin.TubeDLFin.Processes;
 using Jellyfin.Plugin.TubeDLFin.Status;
+using Jellyfin.Plugin.TubeDLFin.Subscriptions;
 using Jellyfin.Plugin.TubeDLFin.Tools;
 using Jellyfin.Plugin.TubeDLFin.Tools.Definitions;
 using Jellyfin.Plugin.TubeDLFin.Tools.Installation;
@@ -78,6 +79,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         // Downloads: add a group of yt-dlp options (subtitles, SponsorBlock, ...) by registering
         // another IDownloadOptionSet. They are applied in this order.
         serviceCollection.AddSingleton<IDownloadRequestValidator, DownloadRequestValidator>();
+        serviceCollection.AddSingleton<IDownloadArchive, DownloadArchive>();
 
         // Naming: add a preset by registering another NamingPreset. The first is the fallback.
         serviceCollection.AddSingleton(NamingPresets.ChannelTitle);
@@ -115,5 +117,14 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<IFinishedItemStep, NfoStep>();
         serviceCollection.AddSingleton<IFinishedItemStep, LibraryRefreshStep>();
         serviceCollection.AddHostedService<DownloadDispatcher>();
+
+        // Subscriptions: add a site's channel links by registering another ISubscriptionFeedResolver.
+        serviceCollection.AddSingleton<ISubscriptionFeedResolver, YouTubeFeedResolver>();
+        serviceCollection.AddSingleton<ISubscriptionFeedLocator, SubscriptionFeedLocator>();
+        serviceCollection.AddSingleton<IFeedReader, FeedReader>();
+        serviceCollection.AddSingleton<ISubscriptionValidator, SubscriptionValidator>();
+        serviceCollection.AddSingleton<ISubscriptionStore, JsonSubscriptionStore>();
+        serviceCollection.AddSingleton<ISubscriptionChecker, SubscriptionChecker>();
+        serviceCollection.AddSingleton<ISubscriptionService, SubscriptionService>();
     }
 }

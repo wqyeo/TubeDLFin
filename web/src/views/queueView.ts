@@ -1,4 +1,5 @@
 import type { DownloadJobInfo } from '../api/types';
+import type { SourceDescriber } from '../subscriptions/subscriptionDirectory';
 import { stageLabel, stateLabels } from './downloadLabels';
 import { button, element, externalLink } from './elements';
 import { formatDuration, formatSize } from './format';
@@ -24,6 +25,7 @@ export interface QueueViewElements {
  */
 export class QueueView {
     private readonly rows = new Map<string, JobRow>();
+    private jobs: readonly DownloadJobInfo[] = [];
     private readonly handlers = {
         cancel: (_id: string) => {},
         remove: (_id: string) => {},
@@ -37,7 +39,10 @@ export class QueueView {
         showLog: (id) => this.handlers.showLog(id),
     };
 
-    constructor(private readonly elements: QueueViewElements) {}
+    constructor(
+        private readonly elements: QueueViewElements,
+        private readonly sources: SourceDescriber,
+    ) {}
 
     onCancel(handler: (id: string) => void): void {
         this.handlers.cancel = handler;
@@ -56,7 +61,13 @@ export class QueueView {
         this.elements.clearFinished.addEventListener('click', handler);
     }
 
+    /** Redraws the last jobs, e.g. once the subscriptions' names are known. */
+    redraw(): void {
+        this.render(this.jobs);
+    }
+
     render(jobs: readonly DownloadJobInfo[]): void {
+        this.jobs = jobs;
         const ids = new Set(jobs.map((job) => job.Id));
         for (const [id, row] of this.rows) {
             if (!ids.has(id)) {
@@ -72,7 +83,7 @@ export class QueueView {
                 this.rows.set(job.Id, row);
             }
 
-            row.update(job);
+            row.update(job, this.sources.describe(job.Source));
             return row.element;
         });
 
@@ -137,7 +148,7 @@ class JobRow {
         this.element.append(header, this.destination, this.bar, this.status, this.error, this.details);
     }
 
-    update(job: DownloadJobInfo): void {
+    update(job: DownloadJobInfo, source: string | undefined): void {
         const state = stateLabels[job.State];
         this.badge.textContent = state.label;
         this.badge.className = `tubedlfin-badge tubedlfin-badge-${state.tone}`;
@@ -147,7 +158,7 @@ class JobRow {
             this.title.replaceChildren(externalLink(job.Title ?? job.Url, job.Url));
         }
 
-        this.destination.textContent = `${job.LibraryName} · ${job.Destination}`;
+        this.destination.textContent = [job.LibraryName, job.Destination, source].filter(Boolean).join(' · ');
 
         const running = job.State === 'Downloading' || job.State === 'Processing';
         this.bar.hidden = !running && job.State !== 'Queued';

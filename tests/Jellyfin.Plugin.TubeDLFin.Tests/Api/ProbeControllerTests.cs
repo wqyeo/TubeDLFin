@@ -28,7 +28,7 @@ public class ProbeControllerTests
     public async Task Probe_ValidLink_ReturnsResult()
     {
         var expected = new ProbeResult { Kind = ProbeKind.Video, Id = "jNQXAC9IVRw", Title = "Me at the zoo" };
-        _prober.ProbeAsync(Arg.Is<MediaUrl>(u => u.Value.AbsoluteUri == Link), true, Arg.Any<CancellationToken>()).Returns(expected);
+        _prober.ProbeAsync(Arg.Is<MediaUrl>(u => u.Value.AbsoluteUri == Link), true, 100, Arg.Any<CancellationToken>()).Returns(expected);
 
         var response = await _controller.Probe(new ProbeRequest { Url = Link, NoPlaylist = true }, TestContext.Current.CancellationToken);
 
@@ -41,7 +41,7 @@ public class ProbeControllerTests
         var response = await _controller.Probe(new ProbeRequest { Url = "not a link" }, TestContext.Current.CancellationToken);
 
         AssertProblem(response, 400, "can't contain spaces");
-        await _prober.DidNotReceiveWithAnyArgs().ProbeAsync(default!, default, TestContext.Current.CancellationToken);
+        await _prober.DidNotReceiveWithAnyArgs().ProbeAsync(default!, default, default, TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class ProbeControllerTests
     [InlineData(ProbeFailure.UnreadableOutput, 502)]
     public async Task Probe_ProbeFails_MapsReasonToStatus(ProbeFailure reason, int status)
     {
-        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).ThrowsAsync(new ProbeFailedException(reason, "Video unavailable"));
+        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).ThrowsAsync(new ProbeFailedException(reason, "Video unavailable"));
 
         var response = await _controller.Probe(new ProbeRequest { Url = Link }, TestContext.Current.CancellationToken);
 
@@ -60,7 +60,7 @@ public class ProbeControllerTests
     [Fact]
     public async Task Probe_ToolNotReady_Is503()
     {
-        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).ThrowsAsync(new ToolNotReadyException("yt-dlp is not installed yet."));
+        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).ThrowsAsync(new ToolNotReadyException("yt-dlp is not installed yet."));
 
         var response = await _controller.Probe(new ProbeRequest { Url = Link }, TestContext.Current.CancellationToken);
 
@@ -72,7 +72,7 @@ public class ProbeControllerTests
     {
         using var cancel = new CancellationTokenSource();
         await cancel.CancelAsync();
-        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).ThrowsAsync(new OperationCanceledException(cancel.Token));
+        _prober.ProbeAsync(Arg.Any<MediaUrl>(), Arg.Any<bool>(), Arg.Any<int>(), Arg.Any<CancellationToken>()).ThrowsAsync(new OperationCanceledException(cancel.Token));
 
         var response = await _controller.Probe(new ProbeRequest { Url = Link }, cancel.Token);
 

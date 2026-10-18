@@ -44,7 +44,7 @@ public class YtDlpMediaProberTests
     [Fact]
     public async Task ProbeAsync_ListsFlatWithLimitAndTimeout()
     {
-        var result = await _prober.ProbeAsync(Url, noPlaylist: false, TestContext.Current.CancellationToken);
+        var result = await _prober.ProbeAsync(Url, noPlaylist: false, 100, TestContext.Current.CancellationToken);
 
         Assert.Equal(["--dump-single-json", "--flat-playlist", "--playlist-items", "1:100"], _options);
         Assert.Equal(TimeSpan.FromMinutes(2), _started?.Timeout);
@@ -54,7 +54,7 @@ public class YtDlpMediaProberTests
     [Fact]
     public async Task ProbeAsync_NoPlaylist_AddsOption()
     {
-        await _prober.ProbeAsync(Url, noPlaylist: true, TestContext.Current.CancellationToken);
+        await _prober.ProbeAsync(Url, noPlaylist: true, 100, TestContext.Current.CancellationToken);
 
         Assert.Equal("--no-playlist", _options[^1]);
     }
@@ -66,7 +66,7 @@ public class YtDlpMediaProberTests
     {
         _inspector.HasPlaylistChoice(Url).Returns(hasChoice);
 
-        var result = await _prober.ProbeAsync(Url, noPlaylist: false, TestContext.Current.CancellationToken);
+        var result = await _prober.ProbeAsync(Url, noPlaylist: false, 100, TestContext.Current.CancellationToken);
 
         Assert.Equal(hasChoice, result.HasPlaylistChoice);
     }
@@ -78,7 +78,7 @@ public class YtDlpMediaProberTests
     {
         Run(1, stdout, "ERROR: [youtube] abc: Video unavailable. This video is private\n");
 
-        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
         Assert.Equal(ProbeFailure.Rejected, ex.Reason);
         Assert.Equal("[youtube] abc: Video unavailable. This video is private", ex.Message);
@@ -89,7 +89,7 @@ public class YtDlpMediaProberTests
     {
         Run(2, "null", string.Empty);
 
-        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
         Assert.Contains("exited with code 2", ex.Message, StringComparison.Ordinal);
     }
@@ -99,7 +99,7 @@ public class YtDlpMediaProberTests
     {
         _runner.RunAsync(Arg.Any<ProcessRequest>(), Arg.Any<CancellationToken>()).Returns(new ProcessResult(-1, string.Empty, string.Empty, TimedOut: true));
 
-        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
         Assert.Equal(ProbeFailure.TimedOut, ex.Reason);
     }
@@ -109,7 +109,7 @@ public class YtDlpMediaProberTests
     {
         Run(0, "Traceback (most recent call last):", string.Empty);
 
-        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        var ex = await Assert.ThrowsAsync<ProbeFailedException>(() => _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
         Assert.Equal(ProbeFailure.UnreadableOutput, ex.Reason);
     }
@@ -119,7 +119,7 @@ public class YtDlpMediaProberTests
     {
         Run(1, Samples.Read("playlist"), "WARNING: [youtube] Some formats are missing\nERROR: [youtube] xyz: Video unavailable\n");
 
-        var result = await _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken);
+        var result = await _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken);
 
         Assert.Equal(ProbeKind.Playlist, result.Kind);
         Assert.Equal(["[youtube] Some formats are missing", "[youtube] xyz: Video unavailable"], result.Warnings);
@@ -130,7 +130,7 @@ public class YtDlpMediaProberTests
     {
         _runner.RunAsync(Arg.Any<ProcessRequest>(), Arg.Any<CancellationToken>()).ThrowsAsync(new Win32Exception("Permission denied"));
 
-        var ex = await Assert.ThrowsAsync<ToolNotReadyException>(() => _prober.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        var ex = await Assert.ThrowsAsync<ToolNotReadyException>(() => _prober.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
         Assert.Contains("Permission denied", ex.Message, StringComparison.Ordinal);
     }

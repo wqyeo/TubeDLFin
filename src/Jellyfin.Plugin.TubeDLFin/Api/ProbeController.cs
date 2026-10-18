@@ -21,9 +21,6 @@ namespace Jellyfin.Plugin.TubeDLFin.Api;
 [Produces(MediaTypeNames.Application.Json)]
 public class ProbeController : ControllerBase
 {
-    // nginx's "client closed request": nobody is left to read the response.
-    private const int ClientClosedRequest = 499;
-
     private readonly IMediaProber _prober;
 
     /// <summary>
@@ -66,7 +63,7 @@ public class ProbeController : ControllerBase
 
         try
         {
-            return await _prober.ProbeAsync(url, request.NoPlaylist, cancellationToken).ConfigureAwait(false);
+            return await _prober.ProbeAsync(url, request.NoPlaylist, IMediaProber.DetectEntryLimit, cancellationToken).ConfigureAwait(false);
         }
         catch (ToolNotReadyException ex)
         {
@@ -74,17 +71,11 @@ public class ProbeController : ControllerBase
         }
         catch (ProbeFailedException ex)
         {
-            var status = ex.Reason switch
-            {
-                ProbeFailure.TimedOut => StatusCodes.Status504GatewayTimeout,
-                ProbeFailure.UnreadableOutput => StatusCodes.Status502BadGateway,
-                _ => StatusCodes.Status422UnprocessableEntity,
-            };
-            return Problem(ex.Message, statusCode: status);
+            return Problem(ex.Message, statusCode: ProbeFailureStatus.For(ex.Reason));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            return StatusCode(ClientClosedRequest);
+            return StatusCode(ProbeFailureStatus.ClientClosedRequest);
         }
     }
 }

@@ -5,6 +5,16 @@ All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.P
 
 ## [Unreleased]
 
+### Added
+- **Subscriptions**: subscribe to a channel or playlist from the Download tab ("Or subscribe" under
+  the options) and TubeDLFin downloads its new uploads with those options, checking every 1 hour
+  to 1 week. The videos it has when you subscribe are not downloaded. A new **Subscriptions** tab
+  lists them with their last and next check, downloads and problems, and has Check now, Pause,
+  Edit and Delete. A failed upload is retried on the next checks, up to 3 times.
+- Scheduled task "Check subscriptions" (every 15 minutes; each subscription has its own interval).
+- The queue shows which subscription added a download.
+- API: `/TubeDLFin/Subscriptions` (list, add, change, delete, `Check`, `Pause`, `Resume`).
+
 ## [1.0.0] - 2026-10-18
 
 First stable release, with the features of 0.9.0. Tested on Linux x64 and on a Raspberry Pi (arm64).

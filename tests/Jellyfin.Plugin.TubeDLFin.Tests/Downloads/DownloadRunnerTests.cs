@@ -55,6 +55,7 @@ public sealed class DownloadRunnerTests : IDisposable
             new YtDlpOutputParser(),
             [new LibraryRefreshStep(_notifier), _failingStep],
             new YtDlpErrorExplainer(),
+            new DownloadArchive(_paths),
             _paths,
             new ManualTimeProvider(Now),
             NullLogger<DownloadRunner>.Instance);

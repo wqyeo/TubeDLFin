@@ -28,41 +28,41 @@ public sealed class ThrottledMediaProberTests : IDisposable
     public async Task ProbeAsync_SecondCallWaitsForFirst()
     {
         var first = new TaskCompletionSource<ProbeResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _inner.ProbeAsync(Url, false, Arg.Any<CancellationToken>()).Returns(first.Task, Task.FromResult(Result));
+        _inner.ProbeAsync(Url, false, 100, Arg.Any<CancellationToken>()).Returns(first.Task, Task.FromResult(Result));
 
-        var running = _throttled.ProbeAsync(Url, false, TestContext.Current.CancellationToken);
-        var waiting = _throttled.ProbeAsync(Url, false, TestContext.Current.CancellationToken);
+        var running = _throttled.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken);
+        var waiting = _throttled.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken);
         await Task.Delay(50, TestContext.Current.CancellationToken);
 
         Assert.False(waiting.IsCompleted);
-        await _inner.Received(1).ProbeAsync(Url, false, Arg.Any<CancellationToken>());
+        await _inner.Received(1).ProbeAsync(Url, false, 100, Arg.Any<CancellationToken>());
 
         first.SetResult(Result);
         Assert.Same(Result, await running);
         Assert.Same(Result, await waiting);
-        await _inner.Received(2).ProbeAsync(Url, false, Arg.Any<CancellationToken>());
+        await _inner.Received(2).ProbeAsync(Url, false, 100, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task ProbeAsync_InnerFails_ReleasesSlot()
     {
-        _inner.ProbeAsync(Url, false, Arg.Any<CancellationToken>())
+        _inner.ProbeAsync(Url, false, 100, Arg.Any<CancellationToken>())
             .Returns(Task.FromException<ProbeResult>(new ProbeFailedException("no")), Task.FromResult(Result));
 
-        await Assert.ThrowsAsync<ProbeFailedException>(() => _throttled.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ProbeFailedException>(() => _throttled.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
 
-        Assert.Same(Result, await _throttled.ProbeAsync(Url, false, TestContext.Current.CancellationToken));
+        Assert.Same(Result, await _throttled.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task ProbeAsync_CancelledWhileWaiting_Throws()
     {
         var blocker = new TaskCompletionSource<ProbeResult>();
-        _inner.ProbeAsync(Url, false, Arg.Any<CancellationToken>()).Returns(blocker.Task);
-        _ = _throttled.ProbeAsync(Url, false, TestContext.Current.CancellationToken);
+        _inner.ProbeAsync(Url, false, 100, Arg.Any<CancellationToken>()).Returns(blocker.Task);
+        _ = _throttled.ProbeAsync(Url, false, 100, TestContext.Current.CancellationToken);
 
         using var cancel = new CancellationTokenSource();
-        var waiting = _throttled.ProbeAsync(Url, false, cancel.Token);
+        var waiting = _throttled.ProbeAsync(Url, false, 100, cancel.Token);
         await cancel.CancelAsync();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => waiting);

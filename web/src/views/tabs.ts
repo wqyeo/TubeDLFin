@@ -5,13 +5,23 @@
 export class TabBar {
     private readonly buttons: HTMLButtonElement[];
     private readonly panels: HTMLElement[];
+    private selected: (name: string) => void = () => {};
 
     constructor(root: ParentNode) {
         this.buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-tubedlfin-tab]')];
         this.panels = [...root.querySelectorAll<HTMLElement>('[data-tubedlfin-panel]')];
         for (const tabButton of this.buttons) {
-            tabButton.addEventListener('click', () => this.select(tabButton.dataset.tubedlfinTab ?? ''));
+            tabButton.addEventListener('click', () => {
+                const name = tabButton.dataset.tubedlfinTab ?? '';
+                this.select(name);
+                this.selected(name);
+            });
         }
+    }
+
+    /** Called when the admin opens a tab. */
+    onSelect(handler: (name: string) => void): void {
+        this.selected = handler;
     }
 
     select(name: string): void {
