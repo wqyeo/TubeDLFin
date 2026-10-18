@@ -58,13 +58,32 @@ export function compareVersionsDescending(a, b) {
  */
 export function changelogSection(markdown, version) {
     const wanted = fullVersion(version);
+    return sectionBody(markdown, (label) => /^[\d.]+$/.test(label) && fullVersion(label) === wanted, version);
+}
+
+/**
+ * The body of CHANGELOG.md's `## [Unreleased]` section, trimmed: the notes of a beta.
+ * @param {string} markdown
+ * @returns {string}
+ */
+export function unreleasedSection(markdown) {
+    return sectionBody(markdown, (label) => label === 'Unreleased', 'Unreleased');
+}
+
+/**
+ * @param {string} markdown
+ * @param {(label: string) => boolean} matches The label between the heading's brackets.
+ * @param {string} name For the error messages.
+ * @returns {string}
+ */
+function sectionBody(markdown, matches, name) {
     const lines = markdown.split(/\r?\n/);
     const start = lines.findIndex((line) => {
-        const heading = /^## \[(?<version>[\d.]+)\]/.exec(line);
-        return heading?.groups?.version !== undefined && fullVersion(heading.groups.version) === wanted;
+        const label = /^## \[(?<label>[^\]]+)\]/.exec(line)?.groups?.label;
+        return label !== undefined && matches(label);
     });
     if (start < 0) {
-        throw new Error(`CHANGELOG.md has no "## [${version}]" section`);
+        throw new Error(`CHANGELOG.md has no "## [${name}]" section`);
     }
 
     const end = lines.findIndex((line, index) => index > start && /^## /.test(line));
@@ -73,7 +92,7 @@ export function changelogSection(markdown, version) {
         .join('\n')
         .trim();
     if (body === '') {
-        throw new Error(`The CHANGELOG.md section for ${version} is empty`);
+        throw new Error(`The CHANGELOG.md section for ${name} is empty`);
     }
 
     return body;

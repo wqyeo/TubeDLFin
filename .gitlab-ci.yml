@@ -1,9 +1,10 @@
 # Kept small on purpose (CI minutes are limited):
 # - one "build" job does everything: web lint/type check, dotnet build (which also bundles web/), tests
 # - runs only for main, merge requests and tags, and not when only docs changed
-# - a version tag (vX.Y.Z) also publishes the release: "package" builds the zip and uploads it to
-#   the package registry, "release" creates the GitLab Release, "pages" adds the version to the
-#   plugin repository manifest on GitLab Pages (see docs/RELEASING.md)
+# - a version tag also publishes the release: "package" builds the zip and uploads it to the
+#   package registry, "release" creates the GitLab Release, "pages" adds the version to the plugin
+#   repository manifests on GitLab Pages. vX.Y.Z goes to both manifests, vX.Y.Z-beta.N only to the
+#   beta one (see docs/RELEASING.md)
 
 workflow:
   rules:
@@ -21,6 +22,7 @@ variables:
   DOTNET_NOLOGO: "1"
   NUGET_PACKAGES: $CI_PROJECT_DIR/.cache/nuget
   npm_config_cache: $CI_PROJECT_DIR/.cache/npm
+  PAGES_URL: https://wqyeo.gitlab.io/jellyfin-plugin-tubedlfin
 
 .node: &install-node
   - curl -fsSL "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" | tar -xz -C /opt
@@ -49,7 +51,7 @@ package:
   stage: deploy
   needs: [build]
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-beta\.\d+)?$/
   cache:
     key:
       files: [Directory.Packages.props, web/package-lock.json]
@@ -60,13 +62,13 @@ package:
     - apt-get update -qq && apt-get install -y -qq python3-venv >/dev/null
     - python3 -m venv /opt/jprm && /opt/jprm/bin/pip install -q "jprm==1.1.0"
   script:
-    - VERSION="${CI_COMMIT_TAG#v}.0"
     - PROPS_VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' Directory.Build.props | head -n 1)"
     - |
-      if [ "$VERSION" != "$PROPS_VERSION" ]; then
-        echo "Tag $CI_COMMIT_TAG does not match version $PROPS_VERSION in Directory.Build.props"; exit 1
-      fi
-    - node web/release/release-notes.mjs CHANGELOG.md "$VERSION" > release-notes.md
+      GUID="$(sed -n 's/^guid: *"\(.*\)"/\1/p' build.yaml)"
+    - >
+      VERSION="$(node web/release/release-version.mjs --tag "$CI_COMMIT_TAG"
+      --props-version "$PROPS_VERSION" --guid "$GUID" --pages-url "$PAGES_URL")"
+    - node web/release/release-notes.mjs CHANGELOG.md "$CI_COMMIT_TAG" > release-notes.md
     - mkdir -p artifacts
     - /opt/jprm/bin/jprm plugin build . --output artifacts
     - ZIP="tubedlfin_$VERSION.zip"
@@ -87,7 +89,7 @@ release:
   needs: [package]
   image: registry.gitlab.com/gitlab-org/cli:latest
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-beta\.\d+)?$/
   script:
     - echo "Releasing TubeDLFin $VERSION"
   release:
@@ -105,17 +107,18 @@ pages:
   needs: [package]
   image: docker.io/library/node:24-alpine
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-beta\.\d+)?$/
   script:
     - mkdir -p public
     - cp docs/images/logo.png public/logo.png
     - >
       node web/release/publish-manifest.mjs
+      --tag "$CI_COMMIT_TAG"
       --zip "artifacts/tubedlfin_$VERSION.zip"
       --source-url "$ZIP_URL"
       --changelog CHANGELOG.md
-      --previous "$CI_PAGES_URL/manifest.json"
-      --image-url "$CI_PAGES_URL/logo.png"
-      --out public/manifest.json
+      --pages-url "$PAGES_URL"
+      --image-url "$PAGES_URL/logo.png"
+      --out-dir public
   artifacts:
     paths: [public/]

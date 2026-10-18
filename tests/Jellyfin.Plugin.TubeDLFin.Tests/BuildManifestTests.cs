@@ -39,10 +39,15 @@ public class BuildManifestTests
     public void Changelog_HasSectionForVersion()
     {
         // The release pipeline publishes this section as the release notes and fails without it.
+        // X.Y.Z.0 is a stable release; a higher build number may be a beta, whose notes come
+        // from [Unreleased] until X.Y.Z is released.
         var changelog = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "CHANGELOG.md"));
         var version = Version.Parse(YamlValue("version"));
+        var released = changelog.Contains($"\n## [{version.ToString(3)}] - ", StringComparison.Ordinal);
 
-        Assert.Contains($"\n## [{version.ToString(3)}] - ", changelog, StringComparison.Ordinal);
+        Assert.True(
+            released || (version.Revision > 0 && changelog.Contains("\n## [Unreleased]", StringComparison.Ordinal)),
+            $"CHANGELOG.md needs a \"## [{version.ToString(3)}] - date\" section for {version}");
     }
 
     [Fact]

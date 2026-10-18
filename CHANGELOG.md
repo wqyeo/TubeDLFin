@@ -1,7 +1,8 @@
 # Changelog
 
-All notable changes to TubeDLFin are listed here. Versions follow `MAJOR.MINOR.PATCH.0`
-(Jellyfin plugin versions have four parts).
+All notable changes to TubeDLFin are listed here. Versions are `MAJOR.MINOR.PATCH.BUILD`
+(Jellyfin plugin versions have four parts): `BUILD` is 0, or counts the betas before a release.
+Betas are published in the beta repository only (see the README), with the `[Unreleased]` notes.
 
 ## [Unreleased]
 

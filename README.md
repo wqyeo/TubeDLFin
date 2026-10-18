@@ -110,6 +110,18 @@ account too. Give yt-dlp a browser's cookies:
 yt-dlp writes refreshed cookies back to the file. The cookies give access to your account,
 so keep the file private.
 
+### Beta versions
+
+New features go out as betas first. To try them, add a second repository next to the first:
+
+- Name: `TubeDLFin beta`
+- URL: `https://wqyeo.gitlab.io/jellyfin-plugin-tubedlfin/manifest-beta.json`
+
+Jellyfin then offers the newest version, beta or not: update TubeDLFin under **Available** and
+restart. A beta's changelog in the catalog starts with "Beta". When the stable release comes
+out, the server updates to it like any other version. To stop getting betas, remove that
+repository; the beta stays installed until the next stable version replaces it.
+
 ## Usage
 
 1. Open **TubeDLFin** in the dashboard and paste a link on the **Download** tab.

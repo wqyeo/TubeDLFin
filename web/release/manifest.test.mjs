@@ -7,6 +7,7 @@ import {
     fullVersion,
     loadPublishedManifest,
     pluginEntry,
+    unreleasedSection,
 } from './manifest.mjs';
 
 const meta = {
@@ -85,6 +86,16 @@ describe('changelogSection', () => {
     it('fails for a missing or empty section', () => {
         assert.throws(() => changelogSection(changelog, '2.0.0'), /no "## \[2.0.0\]" section/);
         assert.throws(() => changelogSection('## [1.0.0]\n\n## [0.9.0]\nx', '1.0.0'), /empty/);
+    });
+});
+
+describe('unreleasedSection', () => {
+    it('returns the [Unreleased] notes', () => {
+        assert.equal(unreleasedSection('## [Unreleased]\n\n- New.\n\n## [1.0.0] - 2026-10-20\nx'), '- New.');
+    });
+
+    it('fails when there are none', () => {
+        assert.throws(() => unreleasedSection(changelog), /section for Unreleased is empty/);
     });
 });
 

@@ -1,12 +1,13 @@
-// Prints a version's CHANGELOG.md section (the GitLab Release description).
+// Prints a release tag's notes (the GitLab Release description): its CHANGELOG.md section, or
+// for a beta the [Unreleased] section.
 //
-//   node release/release-notes.mjs <CHANGELOG.md> <version>
+//   node release/release-notes.mjs <CHANGELOG.md> <tag>
 import { readFile } from 'node:fs/promises';
-import { changelogSection } from './manifest.mjs';
+import { parseReleaseTag, releaseNotes } from './channels.mjs';
 
-const [changelogPath, version] = process.argv.slice(2);
-if (!changelogPath || !version) {
-    throw new Error('Usage: node release/release-notes.mjs <CHANGELOG.md> <version>');
+const [changelogPath, tag] = process.argv.slice(2);
+if (!changelogPath || !tag) {
+    throw new Error('Usage: node release/release-notes.mjs <CHANGELOG.md> <tag>');
 }
 
-console.log(changelogSection(await readFile(changelogPath, 'utf8'), version));
+console.log(releaseNotes(await readFile(changelogPath, 'utf8'), parseReleaseTag(tag)));
