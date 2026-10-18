@@ -44,7 +44,58 @@
                 <div class="verticalSection tubedlfin-result" data-tubedlfin="detect-result" hidden></div>
 
                 <form class="verticalSection tubedlfin-download" data-tubedlfin="download-form" novalidate hidden>
-                    <h3 class="sectionTitle">Download</h3>
+                    <h3 class="sectionTitle" data-tubedlfin="download-title">Download</h3>
+
+                    <div class="tubedlfin-mode" role="radiogroup" aria-label="What to do" data-tubedlfin="action" hidden>
+                        <label class="tubedlfin-segment-option">
+                            <input type="radio" name="TubeDLFinAction" value="download" data-tubedlfin="action-download" checked />
+                            <span>Download now</span>
+                        </label>
+                        <label class="tubedlfin-segment-option">
+                            <input type="radio" name="TubeDLFinAction" value="subscribe" data-tubedlfin="action-subscribe" />
+                            <span>Subscribe</span>
+                        </label>
+                    </div>
+
+                    <div class="tubedlfin-subscribe" data-tubedlfin="subscribe" hidden>
+                        <p class="fieldDescription">
+                            Checks this channel or playlist on a schedule and downloads its new uploads with the
+                            options below.
+                        </p>
+                        <div class="tubedlfin-grid">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="TubeDLFinSubscribeName">Name</label>
+                                <input is="emby-input" type="text" id="TubeDLFinSubscribeName" data-tubedlfin="subscribe-name"
+                                    maxlength="200" autocomplete="off" />
+                            </div>
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="TubeDLFinSubscribeInterval">Check</label>
+                                <select is="emby-select" id="TubeDLFinSubscribeInterval" data-tubedlfin="subscribe-interval"></select>
+                            </div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label>
+                                <input type="checkbox" is="emby-checkbox" data-tubedlfin="subscribe-existing" />
+                                <span>Also download the videos it has now</span>
+                            </label>
+                            <div class="fieldDescription checkboxFieldDescription">
+                                Otherwise only uploads from now on are downloaded.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inputContainer" data-tubedlfin="download-playlist-options" hidden>
+                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinPlaylistItems">Items</label>
+                        <input is="emby-input" type="text" id="TubeDLFinPlaylistItems" data-tubedlfin="download-playlist-items"
+                            placeholder="All" autocomplete="off" spellcheck="false" />
+                        <div class="fieldDescription">
+                            Leave blank for all, or e.g. "1-10", "1,3,5" or "20:" (from item 20 to the end).
+                            A channel lists its newest videos first.
+                        </div>
+                        <div class="fieldDescription tubedlfin-warn" data-tubedlfin="download-playlist-hint" hidden>
+                            This downloads every tab and playlist listed above. Open one of them to download only its items.
+                        </div>
+                    </div>
 
                     <div class="tubedlfin-mode" role="radiogroup" aria-label="What to keep">
                         <label class="tubedlfin-segment-option">
@@ -107,18 +158,6 @@
                                 <option value="192">192 kbit/s</option>
                                 <option value="128">128 kbit/s</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div class="inputContainer" data-tubedlfin="download-playlist-options" hidden>
-                        <label class="inputLabel inputLabelUnfocused" for="TubeDLFinPlaylistItems">Items</label>
-                        <input is="emby-input" type="text" id="TubeDLFinPlaylistItems" data-tubedlfin="download-playlist-items"
-                            placeholder="All" autocomplete="off" spellcheck="false" />
-                        <div class="fieldDescription">
-                            Leave blank for all, or e.g. "1-10", "1,3,5" or "20:" (from item 20 to the end).
-                        </div>
-                        <div class="fieldDescription tubedlfin-warn" data-tubedlfin="download-playlist-hint" hidden>
-                            This downloads every tab and playlist listed above. Open one of them to download only its items.
                         </div>
                     </div>
 
@@ -214,7 +253,7 @@
                         <p class="fieldDescription">YouTube only. Nothing is cut unless a category is ticked.</p>
                     </details>
 
-                    <div class="checkboxContainer">
+                    <div class="checkboxContainer" data-tubedlfin="download-redownload-option">
                         <label>
                             <input type="checkbox" is="emby-checkbox" data-tubedlfin="download-redownload" />
                             <span>Download again even if already downloaded into this library</span>
@@ -227,31 +266,6 @@
                         <span class="fieldDescription" data-tubedlfin="download-status" aria-live="polite"></span>
                     </div>
                     <p class="tubedlfin-error" data-tubedlfin="download-error" role="alert" hidden></p>
-
-                    <div class="tubedlfin-subscribe" data-tubedlfin="subscribe" hidden>
-                        <h4>Or subscribe</h4>
-                        <p class="fieldDescription">
-                            Check this channel or playlist on a schedule and download its new uploads with the
-                            options above. The videos it has now are not downloaded.
-                        </p>
-                        <div class="tubedlfin-grid">
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="TubeDLFinSubscribeName">Name</label>
-                                <input is="emby-input" type="text" id="TubeDLFinSubscribeName" data-tubedlfin="subscribe-name"
-                                    maxlength="200" autocomplete="off" />
-                            </div>
-                            <div class="selectContainer">
-                                <label class="selectLabel" for="TubeDLFinSubscribeInterval">Check</label>
-                                <select is="emby-select" id="TubeDLFinSubscribeInterval" data-tubedlfin="subscribe-interval"></select>
-                            </div>
-                        </div>
-                        <div class="tubedlfin-actions">
-                            <button is="emby-button" type="button" class="raised emby-button"
-                                data-tubedlfin="subscribe-submit">Subscribe</button>
-                            <span class="fieldDescription" data-tubedlfin="subscribe-status" aria-live="polite"></span>
-                        </div>
-                        <p class="tubedlfin-error" data-tubedlfin="subscribe-error" role="alert" hidden></p>
-                    </div>
                 </form>
 
                 <div class="verticalSection" data-tubedlfin="queue">
@@ -271,7 +285,8 @@
                     <p class="fieldDescription">
                         TubeDLFin checks each channel or playlist on its schedule and downloads new uploads with
                         the options chosen when subscribing (Dashboard → Scheduled Tasks → "Check subscriptions"
-                        runs every 15 minutes). To subscribe, detect a channel or playlist on the Download tab.
+                        runs every 15 minutes). To subscribe, detect a channel or playlist on the Download tab and
+                        choose Subscribe.
                     </p>
                     <p class="fieldDescription" data-tubedlfin="subscriptions-empty">No subscriptions yet.</p>
                     <div class="tubedlfin-queue" data-tubedlfin="subscriptions-list"></div>

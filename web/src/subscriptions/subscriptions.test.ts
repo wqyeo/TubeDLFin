@@ -4,7 +4,7 @@ import type { ProbeResult, SubscriptionInfo } from '../api/types';
 import type { DownloadFormValues } from '../downloads/downloadRequest';
 import { SubscriptionDirectory } from './subscriptionDirectory';
 import { buildSubscriptionRequest, suggestedName } from './subscriptionRequest';
-import { checkSummary, countsSummary, intervalLabel } from './subscriptionText';
+import { checkSummary, countsSummary, intervalLabel, subscribedMessage } from './subscriptionText';
 
 const channel: ProbeResult = {
     Kind: 'Channel',
@@ -150,6 +150,19 @@ describe('countsSummary', () => {
         assert.equal(
             countsSummary({ ...subscription, Downloaded: 3, Queued: 1, GivenUp: 2 }),
             '3 downloaded · 1 in the queue · 2 failed 3 times, not tried again',
+        );
+    });
+});
+
+describe('subscribedMessage', () => {
+    it('says whether the videos it has now were queued too', () => {
+        assert.equal(
+            subscribedMessage('Blender', 6, false),
+            'Subscribed to "Blender". New uploads will be checked every 6 hours; see the Subscriptions tab.',
+        );
+        assert.equal(
+            subscribedMessage('Blender', 24, true),
+            'Subscribed to "Blender" and added the videos it has now to the queue. New uploads will be checked every day; see the Subscriptions tab.',
         );
     });
 });

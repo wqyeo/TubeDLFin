@@ -223,7 +223,8 @@
 }
 
 /* Download options */
-.tubedlfin-mode {
+/* :not([hidden]): display would otherwise override the hidden attribute. */
+.tubedlfin-mode:not([hidden]) {
     display: flex;
     gap: 0.5em;
     margin-bottom: 1.2em;
@@ -395,9 +396,8 @@
 }
 
 .tubedlfin-subscribe {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 1.5em;
-    padding-top: 0.5em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1.2em;
 }
 
 /* :not([hidden]): display would otherwise override the hidden attribute. */

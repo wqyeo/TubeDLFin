@@ -54,3 +54,9 @@ export function countsSummary(subscription: SubscriptionInfo): string {
 
     return parts.join(' · ');
 }
+
+/** What subscribing did, shown next to the form's button. */
+export function subscribedMessage(name: string, intervalHours: number, queuedExisting: boolean): string {
+    const queued = queuedExisting ? ' and added the videos it has now to the queue' : '';
+    return `Subscribed to "${name}"${queued}. New uploads will be checked ${intervalLabel(intervalHours)}; see the Subscriptions tab.`;
+}

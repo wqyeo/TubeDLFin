@@ -15,7 +15,8 @@ export interface QueueRefresher {
 
 /**
  * The "Download" step: shows the options form for the detected link, fills it from the
- * library's defaults and the options remembered for music or video, and queues the download.
+ * library's defaults and the options remembered for music or video, and queues the download
+ * when the form is submitted to download (see ActionSection).
  */
 export class DownloadSection implements PageSection {
     constructor(
@@ -27,9 +28,6 @@ export class DownloadSection implements PageSection {
     ) {
         detectStore.subscribe((state) => this.onDetectChanged(state));
         form.onLibraryChanged((library) => this.applyLibrary(library));
-        form.onSubmit((values) => {
-            void this.download(values);
-        });
     }
 
     async load(): Promise<void> {
@@ -91,7 +89,7 @@ export class DownloadSection implements PageSection {
         }
     }
 
-    private async download(values: DownloadFormValues): Promise<void> {
+    async submit(values: DownloadFormValues): Promise<void> {
         const state = this.detectStore.current;
         if (state.status !== 'detected') {
             return;
@@ -105,7 +103,7 @@ export class DownloadSection implements PageSection {
                 this.memory.save(categoryOf(library), values);
             }
 
-            this.form.showAdded(`Added "${job.Title ?? state.result.Title}" to the queue.`);
+            this.form.showDone(`Added "${job.Title ?? state.result.Title}" to the queue.`);
             await this.queue.refresh();
         } catch (error) {
             this.form.showError(describeError(error));

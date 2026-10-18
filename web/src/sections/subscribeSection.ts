@@ -1,18 +1,20 @@
 import type { TubeDLFinApi } from '../api/tubeDlFinApi';
 import type { LibraryInfo } from '../api/types';
-import type { DownloadFormValues } from '../downloads/downloadRequest';
+import { buildDownloadRequest, type DownloadFormValues } from '../downloads/downloadRequest';
 import { categoryOf } from '../downloads/libraryDefaults';
 import type { OptionsMemory } from '../downloads/optionsMemory';
 import { describeError } from '../errors';
-import type { DetectState, DetectStore } from '../state/detectStore';
-import { buildSubscriptionRequest, suggestedName } from '../subscriptions/subscriptionRequest';
-import { intervalLabel } from '../subscriptions/subscriptionText';
-import type { SubscribeForm } from '../views/subscribeForm';
-import type { PageSection } from './pageSection';
+import type { DetectStore } from '../state/detectStore';
+import { buildSubscriptionRequest } from '../subscriptions/subscriptionRequest';
+import { subscribedMessage } from '../subscriptions/subscriptionText';
+import type { SubscribeFormValues } from '../views/subscribeForm';
+import type { QueueRefresher } from './downloadSection';
 
-/** Where the download options are read from: the download form. */
-export interface DownloadOptionsSource {
-    values(): DownloadFormValues;
+/** Where the outcome of submitting the form is shown: the download form's button and status. */
+export interface SubmitFeedback {
+    setBusy(busy: boolean): void;
+    showDone(message: string): void;
+    showError(message: string): void;
     selectedLibrary(): LibraryInfo | undefined;
 }
 
@@ -22,61 +24,64 @@ export interface SubscriptionsRefresher {
 }
 
 /**
- * The "Subscribe" step: offered for a detected channel or playlist, it subscribes with the
- * options set in the download form.
+ * Subscribing: when the form is submitted to subscribe (see ActionSection), subscribes to the
+ * detected channel or playlist with the form's options, and if asked also queues what it has now.
  */
-export class SubscribeSection implements PageSection {
+export class SubscribeSection {
     constructor(
         private readonly api: TubeDLFinApi,
         private readonly detectStore: DetectStore,
-        private readonly view: SubscribeForm,
-        private readonly options: DownloadOptionsSource,
+        private readonly feedback: SubmitFeedback,
         private readonly memory: OptionsMemory,
+        private readonly queue: QueueRefresher,
         private readonly subscriptions: SubscriptionsRefresher,
-    ) {
-        detectStore.subscribe((state) => this.onDetectChanged(state));
-        view.onSubmit((name, hours) => {
-            void this.subscribe(name, hours);
-        });
-    }
+    ) {}
 
-    load(): Promise<void> {
-        return Promise.resolve();
-    }
-
-    private onDetectChanged(state: DetectState): void {
-        if (state.status === 'detected' && state.result.Kind !== 'Video') {
-            this.view.show(suggestedName(state.result));
-        } else {
-            this.view.hide();
-        }
-    }
-
-    private async subscribe(name: string, intervalHours: number): Promise<void> {
+    async submit(values: DownloadFormValues, subscription: SubscribeFormValues): Promise<void> {
         const state = this.detectStore.current;
         if (state.status !== 'detected') {
             return;
         }
 
-        this.view.setBusy(true);
+        this.feedback.setBusy(true);
         try {
-            const values = this.options.values();
-            const subscription = await this.api.addSubscription(
-                buildSubscriptionRequest(values, state.request, state.result, name, intervalHours),
+            const added = await this.api.addSubscription(
+                buildSubscriptionRequest(
+                    values,
+                    state.request,
+                    state.result,
+                    subscription.name,
+                    subscription.intervalHours,
+                ),
             );
-            const library = this.options.selectedLibrary();
+            const library = this.feedback.selectedLibrary();
             if (library) {
                 this.memory.save(categoryOf(library), values);
             }
 
-            this.view.showDone(
-                `Subscribed to "${subscription.Name}". New uploads will be checked ${intervalLabel(subscription.IntervalHours)}; see the Subscriptions tab.`,
-            );
             await this.subscriptions.refresh();
+            if (subscription.includeExisting) {
+                // Subscribed first: if that fails (already subscribed), nothing is queued either.
+                try {
+                    await this.api.addDownload(
+                        buildDownloadRequest({ ...values, redownload: false }, state.request, state.result),
+                    );
+                    await this.queue.refresh();
+                } catch (error) {
+                    this.feedback.showError(
+                        `Subscribed to "${added.Name}", but the videos it has now could not be queued: ${describeError(error)}`,
+                    );
+                    return;
+                }
+            }
+
+            this.feedback.showDone(
+                subscribedMessage(added.Name, added.IntervalHours, subscription.includeExisting),
+            );
         } catch (error) {
-            this.view.showError(describeError(error));
+            this.feedback.showError(describeError(error));
         } finally {
-            this.view.setBusy(false);
+            this.feedback.setBusy(false);
         }
     }
 }

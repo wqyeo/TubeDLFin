@@ -7,6 +7,7 @@ import type {
     VideoContainer,
 } from '../../api/types';
 import { type DownloadFormValues, formatValuePrefix, hasBitrate } from '../../downloads/downloadRequest';
+import { type FormLayout, formLayout } from '../../downloads/formLayout';
 import { estimateSize } from '../../downloads/freeSpace';
 import type { RememberedOptions } from '../../downloads/optionsMemory';
 import { element } from '../elements';
@@ -23,6 +24,7 @@ const heights = [2160, 1440, 1080, 720, 480, 360];
 /** Elements of the download form itself (the field groups have their own). */
 export interface DownloadFormElements {
     form: HTMLFormElement;
+    title: HTMLElement;
     modeVideo: HTMLInputElement;
     modeAudio: HTMLInputElement;
     videoOptions: HTMLElement;
@@ -37,6 +39,7 @@ export interface DownloadFormElements {
     playlistOptions: HTMLElement;
     playlistItems: HTMLInputElement;
     playlistHint: HTMLElement;
+    redownloadOption: HTMLElement;
     redownload: HTMLInputElement;
     submit: HTMLButtonElement;
     status: HTMLElement;
@@ -55,10 +58,12 @@ export interface DownloadFormGroups {
 
 /**
  * The options form under a detected link. A view only: it shows and reads values. Which
- * values to start from (library defaults, remembered options) is the section's decision.
+ * values to start from (library defaults, remembered options), and whether it downloads or
+ * subscribes (its layout), are the sections' decisions.
  */
 export class DownloadForm {
     private isList = false;
+    private layout: FormLayout = formLayout(false, 'download', false);
 
     constructor(
         private readonly elements: DownloadFormElements,
@@ -116,7 +121,6 @@ export class DownloadForm {
 
         const isList = result.Kind !== 'Video';
         this.isList = isList;
-        elements.playlistOptions.hidden = !isList;
         elements.playlistItems.value = '';
         elements.playlistHint.hidden = !(
             isList &&
@@ -136,6 +140,22 @@ export class DownloadForm {
 
     hide(): void {
         this.elements.form.hidden = true;
+    }
+
+    /** Shows the parts for downloading or for subscribing. */
+    setLayout(layout: FormLayout): void {
+        const elements = this.elements;
+        this.layout = layout;
+        elements.title.textContent = layout.title;
+        elements.playlistOptions.hidden = !layout.showItems;
+        elements.redownloadOption.hidden = !layout.showRedownload;
+        if (!layout.showRedownload) {
+            elements.redownload.checked = false;
+        }
+
+        elements.status.textContent = '';
+        elements.error.hidden = true;
+        this.setBusy(false);
     }
 
     /** Sets the given values; anything left out keeps its current value. */
@@ -175,10 +195,10 @@ export class DownloadForm {
 
     setBusy(busy: boolean): void {
         this.elements.submit.disabled = busy || !this.groups.destination.hasLibraries;
-        this.elements.submit.textContent = busy ? 'Adding…' : 'Download';
+        this.elements.submit.textContent = busy ? this.layout.busyLabel : this.layout.submitLabel;
     }
 
-    showAdded(message: string): void {
+    showDone(message: string): void {
         this.elements.error.hidden = true;
         this.elements.status.textContent = message;
     }

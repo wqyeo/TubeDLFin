@@ -7,6 +7,7 @@ import { injectStyles, requireElement } from './dom';
 import { BrowserOptionsMemory } from './downloads/optionsMemory';
 import { TubeDLFinPage } from './page';
 import { pluginId } from './plugin';
+import { ActionSection } from './sections/actionSection';
 import { DetectSection } from './sections/detectSection';
 import { DownloadSection } from './sections/downloadSection';
 import { InfoSection } from './sections/infoSection';
@@ -18,6 +19,7 @@ import { ToolsSection } from './sections/toolsSection';
 import { DetectStore } from './state/detectStore';
 import styles from './styles.css';
 import { SubscriptionDirectory } from './subscriptions/subscriptionDirectory';
+import { ActionChoice } from './views/actionChoice';
 import { DetectForm } from './views/detectForm';
 import { DetectResultView } from './views/detectResultView';
 import { DestinationFields } from './views/downloadForm/destinationFields';
@@ -77,6 +79,7 @@ export default class TubeDLFinController {
         const downloadForm = new DownloadForm(
             {
                 form: find<HTMLFormElement>('download-form'),
+                title: find('download-title'),
                 modeVideo: find<HTMLInputElement>('download-mode-video'),
                 modeAudio: find<HTMLInputElement>('download-mode-audio'),
                 videoOptions: find('download-video-options'),
@@ -91,6 +94,7 @@ export default class TubeDLFinController {
                 playlistOptions: find('download-playlist-options'),
                 playlistItems: find<HTMLInputElement>('download-playlist-items'),
                 playlistHint: find('download-playlist-hint'),
+                redownloadOption: find('download-redownload-option'),
                 redownload: find<HTMLInputElement>('download-redownload'),
                 submit: find<HTMLButtonElement>('download-submit'),
                 status: find('download-status'),
@@ -141,7 +145,7 @@ export default class TubeDLFinController {
         );
         const download = new DownloadSection(api, detectStore, downloadForm, optionsMemory, queue);
 
-        // Subscriptions tab, and the Subscribe step under the download options
+        // Subscriptions tab, and the "Download now / Subscribe" choice in the download form
         const subscriptions = new SubscriptionsSection(
             api,
             new SubscriptionsView({
@@ -156,17 +160,27 @@ export default class TubeDLFinController {
         const subscribe = new SubscribeSection(
             api,
             detectStore,
+            downloadForm,
+            optionsMemory,
+            queue,
+            subscriptions,
+        );
+        const action = new ActionSection(
+            detectStore,
+            new ActionChoice({
+                container: find('action'),
+                download: find<HTMLInputElement>('action-download'),
+                subscribe: find<HTMLInputElement>('action-subscribe'),
+            }),
             new SubscribeForm({
                 container: find('subscribe'),
                 name: find<HTMLInputElement>('subscribe-name'),
                 interval: find<HTMLSelectElement>('subscribe-interval'),
-                submit: find<HTMLButtonElement>('subscribe-submit'),
-                status: find('subscribe-status'),
-                error: find('subscribe-error'),
+                includeExisting: find<HTMLInputElement>('subscribe-existing'),
             }),
             downloadForm,
-            optionsMemory,
-            subscriptions,
+            download,
+            subscribe,
         );
         tabs.onSelect((name) => {
             if (name === 'subscriptions') {
@@ -203,7 +217,7 @@ export default class TubeDLFinController {
 
         new TubeDLFinPage(
             view,
-            [detect, download, subscribe, queue, subscriptions, info, tools, settings],
+            [detect, download, action, queue, subscriptions, info, tools, settings],
             new DashboardLoadingIndicator(Dashboard),
         ).attach();
     }

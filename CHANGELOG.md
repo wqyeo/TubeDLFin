@@ -7,11 +7,12 @@ Betas are published in the beta repository only (see the README), with the `[Unr
 ## [Unreleased]
 
 ### Added
-- **Subscriptions**: subscribe to a channel or playlist from the Download tab ("Or subscribe" under
-  the options) and TubeDLFin downloads its new uploads with those options, checking every 1 hour
-  to 1 week. The videos it has when you subscribe are not downloaded. A new **Subscriptions** tab
-  lists them with their last and next check, downloads and problems, and has Check now, Pause,
-  Edit and Delete. A failed upload is retried on the next checks, up to 3 times.
+- **Subscriptions**: after detecting a channel or playlist, choose **Subscribe** instead of
+  **Download now**, and TubeDLFin downloads its new uploads with the options set, checking every
+  1 hour to 1 week. The videos it has when you subscribe are only downloaded if you tick "Also
+  download the videos it has now" (all of them, or the items you enter). A new **Subscriptions**
+  tab lists them with their last and next check, downloads and problems, and has Check now,
+  Pause, Edit and Delete. A failed upload is retried on the next checks, up to 3 times.
 - Scheduled task "Check subscriptions" (every 15 minutes; each subscription has its own interval).
 - The queue shows which subscription added a download.
 - API: `/TubeDLFin/Subscriptions` (list, add, change, delete, `Check`, `Pause`, `Resume`).

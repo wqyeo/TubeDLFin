@@ -144,15 +144,18 @@ repository; the beta stays installed until the next stable version replaces it.
 
 To download a channel's or playlist's new uploads automatically:
 
-1. Detect the channel or playlist on the **Download** tab and set the options as for a download.
-   A **Shows** library with the "TV show" layout works well: each channel becomes a show with
-   one season per year.
-2. Under **Or subscribe**, pick a name and how often to check (every hour to every week), and
-   press **Subscribe**.
+1. Detect the channel or playlist on the **Download** tab and choose **Subscribe** (instead of
+   **Download now**).
+2. Pick a name and how often to check (every hour to every week).
+3. Set the options as for a download. A **Shows** library with the "TV show" layout works well:
+   each channel becomes a show with one season per year.
+4. Press **Subscribe**.
 
-The videos the channel has at that moment are *not* downloaded; only later uploads are. To get
-some older videos too, download them once from the Download tab: the archive keeps them from
-being downloaded twice.
+Only uploads from then on are downloaded. To get the videos it has now too, tick **Also
+download the videos it has now**: they are queued at once, all of them or the **Items** you
+enter (a channel lists its newest first, so `1-20` is its latest 20). For a playlist, "new"
+means added to the playlist after subscribing. The archive keeps anything from being
+downloaded twice.
 
 The **Subscriptions** tab shows when each was last and will next be checked, how many uploads
 were downloaded, and any problem. **Check now** looks for new uploads straight away. The checks
